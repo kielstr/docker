@@ -1,6 +1,0 @@
-[%
-  session_key = args.SD_KEY;
-  session     = conf.fetch_session(session_key, 'survey');
-
-  PROCESS resources;
-%]

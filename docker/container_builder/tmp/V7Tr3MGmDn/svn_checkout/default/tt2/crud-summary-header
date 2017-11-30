@@ -1,6 +1,0 @@
-[% USE date(format = '%d-%b-%Y') %]
-
-<div class="infobox infobox-print">
-  Created: [% date.format(session.get('created')) %]<br/>
-  Completed: [% date.format(session.get('considered_complete')) %]
-</div>
