@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<testsuite errors="1" failures="0" name="test.TestCase-20170928052212" tests="1" time="1.526">
+	<testcase classname="test.TestCase" name="testCase_1_8" time="1.526">
+		<error message="'int' object is not callable" type="TypeError">
+<![CDATA[Traceback (most recent call last):
+  File "/usr/local/lib/python2.7/site-packages/ddt.py", line 139, in wrapper
+    return func(self, *args, **kwargs)
+  File "/shared/test.py", line 699, in testCase
+    case(self, caseIndex)
+TypeError: 'int' object is not callable
+]]>		</error>
+	</testcase>
+	<system-out>
+<![CDATA[]]>	</system-out>
+	<system-err>
+<![CDATA[]]>	</system-err>
+</testsuite>

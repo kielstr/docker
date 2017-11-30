@@ -1,0 +1,34 @@
+---
+close: 0
+component_id: 4325b8f8-afa0-4e0a-92bc-7c5ebe992a11
+frontend_urls:
+  production: https://link-me.study/survey
+  staging: https://university-melbourne.staging.websurvey.net.au/link-me/survey
+  testing: https://university-melbourne.testing.websurvey.net.au/link-me/survey
+  development: http://localhost:5556/survey
+get_session:
+  SessionFrom: CGIParam
+  CreateSession: Never
+progress_meter: 0
+session_parameter: SD_KEY
+style: responsive
+survey_title: Link-me
+template_version: '6'
+y2p:
+  Processors:
+  - PageOrder
+  - Percent
+  - UploadForm
+
+banner:
+  - filename: linkme-surveyheader.png
+    alt: Link Me Logo
+    align: right
+
+
+extra_js:
+  - specify_other.js
+  - rangeslider.min.js
+  - modal.js
+extra_css:
+  - rangeslider.css

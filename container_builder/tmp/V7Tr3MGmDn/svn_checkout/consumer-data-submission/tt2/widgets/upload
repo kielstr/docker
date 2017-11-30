@@ -1,0 +1,44 @@
+[%- DEFAULT size = s.size || 30 %]
+[%- PROCESS buttons_macro %]
+[%-
+    # When an upload is nested in a multi, "Add rows" refreshes ok but
+    # there is no stickiness for upload files.  The val of { file => '' }
+    # made "File was uploaded not entered" appear.
+    val = session.get_subvalue(nspace) || session.stash_get_subvalue(nspace);
+%]
+
+<table class="upload_table">
+  <thead>
+    <tr>
+      <th class='upload-file-header'>File</th>
+      <th>Manage</th>
+      <th>Uploaded</th>
+    </tr>
+  </thead>
+  <tbody>
+  [%- IF !val || !val.orig_fname %]
+    <tr>
+      <td data-label="File"><input type="file" name="slot.[% nspace %].file" size="[% size %]"[% IF e %] aria-invalid="true" aria-describedby="[% nspace %]_error" [% END %]></td>
+      <td data-label="Manage">[% button("show","Upload") %]</td>
+      <td data-label="Uploaded"></td>
+    </tr>
+  [%- ELSE %]
+    <input type="hidden" name="slot.[% nspace %].file" value="">
+    <tr>
+      <td data-label="File">
+        <a href="[% conf.webserver_info.fe_url %]/file/[% nspace %]?SD_KEY=[% session.session_key %]" target="_blank">
+          [% val.orig_fname | html %]</a>
+      </td>
+      <td data-label="Manage">
+        <input type="checkbox"
+            id="slot.[% nspace %].delete"
+            name="slot.[% nspace %].delete"
+            value="1"
+            title="delete"/>
+        [% button("show","Delete") %]
+      </td>
+      <td data-label="Uploaded"><em>[% time_ago(val.time_stamp) %]</em></td>
+    </tr>
+  [%- END %]
+  </tbody>
+</table>

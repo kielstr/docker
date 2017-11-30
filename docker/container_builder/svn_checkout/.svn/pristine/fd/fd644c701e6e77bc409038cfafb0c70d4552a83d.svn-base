@@ -1,0 +1,12 @@
+---
+- survey_session_key
+- patient_id
+- refused
+- created
+- started
+- last_action_plan
+- initial_risk_assessment_session_key
+- risk_assessment_complete
+- phn
+- practice
+- group

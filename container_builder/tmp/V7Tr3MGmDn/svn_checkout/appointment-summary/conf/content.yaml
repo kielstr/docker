@@ -1,0 +1,533 @@
+# Prototypes
+c_v:
+  type: choice
+  widget: choice_v
+
+c_h:
+  type: choice
+  widget: choice_h
+
+mc_v:
+  type: multichoice
+  widget: choice_v
+  check: |
+        sub {
+            my ($slot, $value)  = @_;
+            my %answer          = map {$_ => 1} @{$value};
+            my $text_value;
+            my $open_value;
+            if ( defined $slot->open ) {
+              foreach (@{$value}) {
+                if (/\D/ || $_ >= @{$slot->options}) {
+                  $text_value += 1;
+                }
+              }
+              foreach (@{$slot->open}) {
+                if (exists $answer{$_}) {
+                  $open_value += 1;
+                }
+              }
+              if ($text_value != $open_value) {
+                die E->new( "A response is required" );
+                return 0;
+              }
+              return 1;
+            } else {
+              return 1;
+            }
+          }
+
+mc_h:
+  type: multichoice
+  widget: choice_h
+
+# db_upload - upload slot that stores data in our database
+db_upload:
+  type: upload
+  store_class: 'SD::Slot::Upload::Store::Database'
+
+# datepicker - date slot with jQuery datepicker
+datepicker:
+  type: date
+  widget: datepicker
+  class: datepicker
+
+#
+# Often used
+#
+
+# yes_no - choice with yes or no
+yes_no:
+  type: choice
+  widget: choice_v
+  options:
+    - Yes
+    - No
+
+#
+# Stubs for larger widgets
+#
+
+# tree - org_tree_expand select type with sane check and options subs
+tree:
+  type: choice
+  widget: org_tree_expand
+  check: |
+    sub {
+       my ($self, $item) = @_;
+       unless($item =~ /^\d+$/ && $item >= 1 && $item <= scalar @{ $self->options } ){
+           die E->new("Not one of allowed responses");
+       }
+       return 1;
+    }
+  options: |
+    sub {
+      my $self = shift;
+      use Data::Rmap qw/:all/;
+      return [ rmap_to {
+        return cut( $_->{text} ) if (ref $_ eq 'HASH');
+        return $_ unless ref $_;
+        return shift->recurse;
+      } HASH|ARRAY|VALUE, @{$self->tree} ];
+    }
+
+
+# ranking - a record slot that handles 'rank the following' type questions
+ranking:
+  type: record
+  mandatory: |
+    sub {
+      my $self = shift;
+      return 1 unless defined $_[0];
+      return ! $self->normalize(@_);
+    }
+  # XXX: normalize is depreciated, but.. currently there is no simple
+  # way to override the check sub to run code after the subslot validation
+  normalize: |
+    sub {
+      my( $self, $val ) = @_;
+      my %val_counts;
+      for my $slt ( @{ $self->columns } ) {
+        next if ! exists $val->{ $slt->name }; # Should this be var_name
+        my $v = $val->{ $slt->name };
+        next if (! defined $v || $v =~ /^\s*$/);
+        if ( $val_counts{$v}++ ) {
+          die E->new("More than one criterion has the same ranking ($v)");
+        }
+      }
+      unless ( scalar keys %val_counts == $self->columns->[0]->max_val ) {
+        die E::Skip->new("You must rank the criterion from ".
+          $self->columns->[0]->min_val." to ".$self->columns->[0]->max_val );
+      }
+      return 1;
+    }
+
+
+# You can add more here
+
+email_check:
+  type: text
+  input_type: email
+  widget: textfield
+  size: 80
+  check: |
+    sub {
+      my $self = shift;
+
+      if ($self->exists(@_)) {
+        die E->new("Email already exists");
+      }
+      # Normalize
+      my $email = Email::Valid->address( -address => lc $_[0], -mxcheck => 1 );
+      if ( ! $email ) {
+        die E->new( "You must supply a valid email address (not $_[0])" );
+      }
+      $_[0] = $email;
+      return !! $email;
+    }
+
+phone_check:
+  type: int
+  class: consent
+  min_val: 0
+  max_val: 9999999999
+#  mandatory: 1
+  check: |
+    sub {
+      my $self = shift;
+      $self->super(@_);
+
+      if ($self->exists(@_)) {
+        die E->new("Phone number already exists");
+      }
+
+      my $val = shift;
+
+      my $area_code = substr($val, 0, 2);
+      # Converting international prefix of 61 to 0
+      my $new_number;
+      if ($area_code == "61") {
+        $new_number = substr($val, 0, 2, "0");
+        $area_code  = substr($val, 0, 2);
+      }
+      my $length = length($val);
+      if ( ($length < 10) || ($length > 10) ) {
+        die E->new( "The mobile phone number supplied is incorrect, must be 10 digits" );
+      }
+      return 1;
+    }
+
+
+k10_scale:
+  type: choice
+  widget: choice_v
+  options:
+    - None of the time
+    - A little of the time
+    - Some of the time
+    - Most of the time
+    - All of the time
+
+
+
+---
+start:
+  portal: redirect_to_admin
+  next: sub { $_[1]->set(considered_complete => time()); 'redirect_to_admin' }
+  nav_actions:
+    portal: 1
+    next: 1
+    show: 1
+  nav:
+    - next: Complete Form
+    - portal: Back to Portal
+
+  qns:
+    - heading: "Appointment Summary"
+
+    - slot:
+        name: appointment_date
+        label:
+          text: Date
+          position: aligned
+        type: date
+        picker: none
+        mandatory: 1
+
+
+    - slot:
+        name: rescheduling_cancellation_notes
+        label: "Rescheduling / cancellation notes:"
+        type: textarea
+        rows: 2
+        cols: 80
+
+    - slot:
+        name: client_participation_indicator
+        type: c_v
+        label: "Client participation indicator"
+        options:
+          - Yes
+          - No
+
+    - slot:
+        name: duration
+        label: Duration
+        type: choice
+        options:
+          - 0: No contact took place
+          - 1: '1-15 mins'
+          - 2: '16-30 mins'
+          - 3: '31-45 mins'
+          - 4: '46-60 mins'
+          - 5: '61-75 mins'
+          - 6: '76-90 mins'
+          - 8: '92-105 mins'
+          - 8: '106-120 mins'
+          - 9: 'over 120 mins'
+        widget: choice_v_altvals
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 0 => 'No contact took place' }, { 1 => '1-15 mins' }, { 2 => '16-30 mins' }, { 3 => '31-45 mins' }, { 4 => '46-60 mins' }, { 5 => '61-75 mins' }, { 6 => '76-90 mins' }, { 7 => '91-105 mins' }, { 8 => '106-120 mins' }, { 9 => 'over 120 mins' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => 'No contact took place', 1 => '1-15 mins', 2 => '16-30 mins', 3 => '31-45 mins', 4 => '46-60 mins', 5 => '61-75 mins', 6 => '76-90 mins', 7 => '91-105 mins', 8 => '106-120 mins', 9 => 'over 120 mins'}
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+    - slot:
+        name: final
+        type: c_v
+        label: "Final"
+        options:
+          - No further services are planned for the client in the current episode
+          - Further services are planned for the client in the current episode
+          - Not known at this stage
+
+    - slot:
+        name: interpreter_used
+        label: Interpreter used
+        type: choice
+        options:
+          - 1: Yes
+          - 2: No
+          - 3: Not stated
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 1 => 'Yes' }, { 2 => 'No' }, { 3 => 'Not stated' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 1 => 'Yes', 2 => 'No', 3 => 'Not stated'}
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+    - slot:
+        name: modality
+        label: Modality
+        type: choice
+        options:
+          - 0: No contact took place
+          - 1: Face to Face
+          - 2: Telephone
+          - 3: Video
+          - 4: 'Internet-based'
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 0 => 'No contact took place' }, { 1 => 'Face to Face' }, { 2 => 'Telephone' }, { 3 => 'Video' }, { 4 => 'Internet-based' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => 'No contact took place', 1 => 'Face to Face', 2 => 'Telephone', 3 => 'Video', 4 => 'Internet-based' }
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+    - slot:
+        name: no_show
+        type: c_v
+        label: No Show
+        options:
+          - Yes
+          - No
+
+    - slot:
+        name: participants
+        label: Participants
+        type: choice
+        options:
+          - 1: Individual client
+          - 2: Client group
+          - 3: Family / Client Support Network
+          - 4: Other health professional or service provider
+          - 5: Other
+          - 9: Not stated
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { { 1 => 'Individual client' }, { 2 => 'Client group' }, { 3 => 'Family / Client Support Network' }, { 4 => 'Other health professional or service provider' }, { 5 => 'Other' }, { 9 => 'Not stated' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 1 => 'Individual client', 2 => 'Client group', 3 => 'Family / Client Support Network', 4 => 'Other health professional or service provider', 5 => 'Other', 9 => 'Not stated' }
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+    - slot:
+        name: type
+        label: Type
+        type: choice
+        options:
+          - 1: Assessment
+          - 4: 'Clinical care coordination/liaison'
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 1 => 'Assessment' }, { 4 => 'Clinical care coordination/liaison' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 1 => 'Assessment', 4 => 'Clinical care coordination/liaison' }
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+
+    - slot:
+        name: venue
+        label: Venue
+        type: choice
+        options:
+          - 1: "Client's Home"
+          - 2: "Service provider's office"
+          - 3: GP Practice
+          - 4: Other medical practice
+          - 5: Headspace Centre
+          - 6: Other primary care setting
+          - 7: Public or private hospital
+          - 8: Aged care centre
+          - 9: School or other educational centre
+          - 10: "Client's Workplace"
+          - 11: Other
+          - 98: Not applicable (Service Contact Modality is not face to face)
+          - 99: Not stated
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 1 => "Client's Home" }, { 2 => "Service provider's office" }, { 3 => 'GP Practice' }, { 4 => 'Other medical practice' }, { 5 => 'Headspace Centre' }, { 6 => 'Other primary care setting' }, { 7 => 'Public or private hospital' }, { 8 => 'Aged care centre' }, { 9 => 'School or other educational centre' }, { 10 => "Client's Workplace" }, { 11 => 'Other' }, { 98 => 'Not applicable (Service Contact Modality is not face to face)' }, { 99 => 'Not stated' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 1 => "Client's Home", 2 => "Service provider's office", 3 => 'GP Practice', 4 => 'Other medical practice', 5 => 'Headspace Centre', 6 => 'Other primary care setting', 7 => 'Public or private hospital', 8 => 'Aged care centre', 9 => 'School or other educational centre', 10 => "Client's Workplace", 11 => 'Other', 98 => 'Not applicable (Service Contact Modality is not face to face)', 99 => 'Not stated'}
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+
+    - slot:
+        name: care_package_type
+        label: Care package type
+        type: choice
+        options:
+          - 1: "Support service - vocational"
+          - 2: "Support service - educational"
+          - 3: "Support service - housing related"
+          - 4: "Support service - other"
+          - 5: "Family therapy / counselling"
+          - 6: "Nutritionist"
+          - 7: "Dietitian"
+          - 8: "Exercise physiologist"
+          - 9: "Other allied health service"
+          - 10: "MBS gap payment - psychiatrist"
+          - 11: "MBS gap payment - psychologist"
+          - 12: "MBS gap payment - GP"
+          - 13: "MBS gap payment - other allied health"
+          - 99: "Other additional service (specify)"
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 1 => "Support service - vocational" }, { 2 => "Support service - educational" }, { 3 => "Support service - housing related" }, { 4 => "Support service - other" }, { 5 => "Family therapy / counselling" }, { 6 => "Nutritionist" }, { 7 => "Dietitian" }, { 8 => "Exercise physiologist" }, { 9 => "Other allied health service" }, { 10 => "MBS gap payment - psychiatrist" }, { 11 => "MBS gap payment - psychologist" }, { 12 => "MBS gap payment - GP" }, { 13 => "MBS gap payment - other allied health" }, { 99 => "Other additional service (specify)" } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 1 => "Support service - vocational", 2 => "Support service - educational", 3 => "Support service - housing related", 4 => "Support service - other", 5 => "Family therapy / counselling", 6 => "Nutritionist", 7 => "Dietitian", 8 => "Exercise physiologist", 9 => "Other allied health service", 10 => "MBS gap payment - psychiatrist", 11 => "MBS gap payment - psychologist", 12 => "MBS gap payment - GP", 13 => "MBS gap payment - other allied health", 99 => "Other additional service (specify)" }
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+    - slot:
+        name: care_package_type_other
+        class: not-bold
+        label: "If 'Other additional service', please specify:"
+        type: text
+        size: 80
+
+    - text: <strong>Cost to PHN (Enter in whole dollars)</strong>
+      html: 1
+    - slot:
+        name: cost_phn
+        label:
+          text: $
+          position: left
+        class: not-bold
+        type: int
+        instructions: Please enter numbers only
+
+    - slot:
+        name: contact_went_well
+        label: What about this contact went well?
+        type: textarea
+        rows: 2
+        cols: 80
+
+    - slot:
+        name: contact_not_well
+        label: What about this contact didn’t go well?
+        type: textarea
+        rows: 2
+        cols: 80
+
+---
+last:
+  summary_view: 0
+  nav:
+    - first: Start
+    - prev: Prev
+    - next: Submit
+  next: sub { $_[1]->set(completed=>time()); 'completed' }
+  percent: 99
+  qns:
+    - text: "[% PROCESS last %]"
+      tt2: 1
+
+---
+redirect_to_admin:
+    template: 'back-to-admin-site'

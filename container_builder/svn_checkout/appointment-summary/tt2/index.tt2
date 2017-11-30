@@ -1,0 +1,5 @@
+<h1>Index Page</h1>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vitae tellus sit amet dolor consectetur scelerisque. Curabitur ac velit velit, quis hendrerit eros. Aliquam vitae imperdiet lacus. Curabitur ullamcorper posuere sodales. Sed vitae nisl vel mi aliquet imperdiet. Nullam fermentum risus a tellus convallis id aliquet metus vestibulum. Quisque vel arcu ut enim dignissim aliquet. Mauris neque felis, condimentum quis ullamcorper ut, eleifend id eros. </p>
+
+[% PROCESS "login.tt2" %]

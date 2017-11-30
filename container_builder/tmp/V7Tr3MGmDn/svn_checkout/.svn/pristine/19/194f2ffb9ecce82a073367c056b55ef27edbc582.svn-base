@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<testsuite errors="9" failures="0" name="unittest.suite._ErrorHolder-20170928035654" tests="9" time="0.000">
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase0)" time="0.000">
+		<error message="type object 'TestCase0' has no attribute 'driver'" type="AttributeError">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 344, in setUpClass
+    cls.authenticate(cls.driver, username, password)
+AttributeError: type object 'TestCase0' has no attribute 'driver'
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase1)" time="0.000">
+		<error message="type object 'TestCase1' has no attribute 'driver'" type="AttributeError">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 755, in setUpClass
+    cls.authenticate(cls.driver, username, password)
+AttributeError: type object 'TestCase1' has no attribute 'driver'
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase2)" time="0.000">
+		<error message="type object 'TestCase2' has no attribute 'driver'" type="AttributeError">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 801, in setUpClass
+    cls.authenticate(cls.driver, username, password)
+AttributeError: type object 'TestCase2' has no attribute 'driver'
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase3)" time="0.000">
+		<error message="type object 'TestCase3' has no attribute 'driver'" type="AttributeError">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 846, in setUpClass
+    cls.authenticate(cls.driver, username, password)
+AttributeError: type object 'TestCase3' has no attribute 'driver'
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase4)" time="0.000">
+		<error message="type object 'TestCase4' has no attribute 'driver'" type="AttributeError">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 891, in setUpClass
+    cls.authenticate(cls.driver, username, password)
+AttributeError: type object 'TestCase4' has no attribute 'driver'
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase5)" time="0.000">
+		<error message="type object 'TestCase5' has no attribute 'driver'" type="AttributeError">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 935, in setUpClass
+    cls.authenticate(cls.driver, username, password)
+AttributeError: type object 'TestCase5' has no attribute 'driver'
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase6)" time="0.000">
+		<error message="type object 'TestCase6' has no attribute 'driver'" type="AttributeError">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 981, in setUpClass
+    cls.authenticate(cls.driver, username, password)
+AttributeError: type object 'TestCase6' has no attribute 'driver'
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase7)" time="0.000">
+		<error message="type object 'TestCase7' has no attribute 'driver'" type="AttributeError">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 1026, in setUpClass
+    cls.authenticate(cls.driver, username, password)
+AttributeError: type object 'TestCase7' has no attribute 'driver'
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase8)" time="0.000">
+		<error message="type object 'TestCase8' has no attribute 'driver'" type="AttributeError">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 1071, in setUpClass
+    cls.authenticate(cls.driver, username, password)
+AttributeError: type object 'TestCase8' has no attribute 'driver'
+]]>		</error>
+	</testcase>
+	<system-out>
+<![CDATA[]]>	</system-out>
+	<system-err>
+<![CDATA[]]>	</system-err>
+</testsuite>

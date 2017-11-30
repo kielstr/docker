@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+use v5.16;
+
+use URI;
+
+my $uri = URI->new($ENV{SD_DB_URI});
+
+sub export_var {
+  my ($var, $value) = @_;
+  return "$var=$value";
+}
+
+say export_var('MYSQL_HOST', $uri->host);
+say export_var('MYSQL_PWD', $uri->password);
+say export_var('MYSQL_DBNAME', $uri->dbname);
+
+# MySQL doesn't have a USER env var for some reason.
+say export_var('WS_DB_USER', $uri->user);

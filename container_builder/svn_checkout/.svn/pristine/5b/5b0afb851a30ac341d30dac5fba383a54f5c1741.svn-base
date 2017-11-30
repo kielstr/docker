@@ -1,0 +1,7 @@
+---
+- parent_session
+- survey_session_key
+- patient_id
+- created
+- considered_complete
+- last_risk_assessment

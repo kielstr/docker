@@ -1,0 +1,299 @@
+# Prototypes
+c_v:
+  type: choice
+  widget: choice_v
+
+c_h:
+  type: choice
+  widget: choice_h
+
+mc_v:
+  type: multichoice
+  widget: choice_v
+  check: |
+        sub {
+            my ($slot, $value)  = @_;
+            my %answer          = map {$_ => 1} @{$value};
+            my $text_value;
+            my $open_value;
+            if ( defined $slot->open ) {
+              foreach (@{$value}) {
+                if (/\D/ || $_ >= @{$slot->options}) {
+                  $text_value += 1;
+                }
+              }
+              foreach (@{$slot->open}) {
+                if (exists $answer{$_}) {
+                  $open_value += 1;
+                }
+              }
+              if ($text_value != $open_value) {
+                die E->new( "A response is required" );
+                return 0;
+              }
+              return 1;
+            } else {
+              return 1;
+            }
+          }
+
+mc_h:
+  type: multichoice
+  widget: choice_h
+
+# db_upload - upload slot that stores data in our database
+db_upload:
+  type: upload
+  store_class: 'SD::Slot::Upload::Store::Database'
+
+# datepicker - date slot with jQuery datepicker
+datepicker:
+  type: date
+  widget: datepicker
+  class: datepicker
+
+#
+# Often used 
+#
+
+# yes_no - choice with yes or no
+yes_no:
+  type: choice
+  widget: choice_v
+  options:
+    - Yes
+    - No
+
+#
+# Stubs for larger widgets
+#
+
+# tree - org_tree_expand select type with sane check and options subs
+tree:
+  type: choice 
+  widget: org_tree_expand
+  check: |
+    sub {
+       my ($self, $item) = @_;
+       unless($item =~ /^\d+$/ && $item >= 1 && $item <= scalar @{ $self->options } ){
+           die E->new("Not one of allowed responses");
+       }
+       return 1;
+    }
+  options: |
+    sub {
+      my $self = shift;
+      use Data::Rmap qw/:all/;
+      return [ rmap_to {
+        return cut( $_->{text} ) if (ref $_ eq 'HASH');
+        return $_ unless ref $_;
+        return shift->recurse;
+      } HASH|ARRAY|VALUE, @{$self->tree} ];
+    }
+
+
+# ranking - a record slot that handles 'rank the following' type questions
+ranking:
+  type: record
+  mandatory: |
+    sub {
+      my $self = shift;
+      return 1 unless defined $_[0];
+      return ! $self->normalize(@_);
+    }
+  # XXX: normalize is depreciated, but.. currently there is no simple
+  # way to override the check sub to run code after the subslot validation
+  normalize: |
+    sub {
+      my( $self, $val ) = @_;
+      my %val_counts;
+      for my $slt ( @{ $self->columns } ) {
+        next if ! exists $val->{ $slt->name }; # Should this be var_name
+        my $v = $val->{ $slt->name };
+        next if (! defined $v || $v =~ /^\s*$/);
+        if ( $val_counts{$v}++ ) {
+          die E->new("More than one criterion has the same ranking ($v)");
+        }
+      }
+      unless ( scalar keys %val_counts == $self->columns->[0]->max_val ) {
+        die E::Skip->new("You must rank the criterion from ".
+          $self->columns->[0]->min_val." to ".$self->columns->[0]->max_val );
+      }
+      return 1;
+    }
+
+
+# You can add more here
+
+email_check:
+  type: text
+  input_type: email
+  widget: textfield
+  size: 80
+  check: |
+    sub {
+      my $self = shift;
+
+      if ($self->exists(@_)) {
+        die E->new("Email already exists");
+      }
+      # Normalize
+      my $email = Email::Valid->address( -address => lc $_[0], -mxcheck => 1 );
+      if ( ! $email ) {
+        die E->new( "You must supply a valid email address (not $_[0])" );
+      }
+      $_[0] = $email;
+      return !! $email;
+    }
+
+phone_check:
+  type: int
+  class: consent
+  min_val: 0
+  max_val: 9999999999
+#  mandatory: 1
+  check: |
+    sub {
+      my $self = shift;
+      $self->super(@_);
+
+      if ($self->exists(@_)) {
+        die E->new("Phone number already exists");
+      }
+
+      my $val = shift;
+
+      my $area_code = substr($val, 0, 2);
+      # Converting international prefix of 61 to 0
+      my $new_number;
+      if ($area_code == "61") {
+        $new_number = substr($val, 0, 2, "0");
+        $area_code  = substr($val, 0, 2);
+      }
+      my $length = length($val);
+      if ( ($length < 10) || ($length > 10) ) {
+        die E->new( "The mobile phone number supplied is incorrect, must be 10 digits" );
+      }
+      return 1;
+    }
+
+
+k10_scale:
+  type: choice
+  widget: choice_v
+  options:
+    - None of the time
+    - A little of the time
+    - Some of the time
+    - Most of the time
+    - All of the time
+
+
+---
+start:
+  portal: redirect_to_admin
+  next: sub { $_[1]->set(considered_complete => time()); 'redirect_to_admin' }
+  nav_actions:
+    portal: 1
+    next: 1
+    show: 1
+  nav:
+    - next: Complete Form
+    - portal: Back to Portal
+# 'Care Navigation - Symptom check'
+  qns:
+    - heading: "Symptom check"
+    - text: "[% PROCESS 'crud-summary-header' IF summary_view %]"
+      tt2: 1
+
+    - text: |
+        <p>As part of the Link-me iPad survey you completed the Kessler Psychological Distress Scale or K10. This questionnaire assesses how you’ve been feeling over the last four weeks.</p>
+      html: 1
+
+
+    - slot:
+        name: k1
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel tired out for no good reason?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k2
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel nervous?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k3
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel so nervous that nothing could calm you down?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k4
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel hopeless?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k5
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel restless or fidgety?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k6
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel so restless you could not sit still?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k7
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel depressed?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k8
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel that everything was an effort?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k9
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel so sad that nothing could cheer you up?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k10
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel worthless?
+          html: 1
+        type: k10_scale
+
+---
+last:
+  summary_view: 0
+  nav:
+    - first: Start
+    - prev: Prev
+    - next: Submit
+  next: sub { $_[1]->set(completed=>time()); 'completed' }
+  percent: 99
+  qns:
+    - text: "[% PROCESS last %]"
+      tt2: 1
+
+---
+redirect_to_admin:
+    template: 'back-to-admin-site'

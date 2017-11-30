@@ -1,0 +1,14 @@
+[%- META content_type = "application/json" -%]
+[%- style             = 'just_content' -%]
+
+[%
+
+    # GP list only loaded into survey
+    survey_conf = conf.get_component_config('survey');
+
+    IF args.key == conf.clinic_access_uuid;
+        conf.as_json(survey_conf.gps);
+    ELSE;
+        conf.as_json({});
+    END;
+%]

@@ -1,0 +1,201 @@
+# Prototypes
+c_v:
+  type: choice
+  widget: choice_v
+
+c_h:
+  type: choice
+  widget: choice_h
+
+mc_v:
+  type: multichoice
+  widget: choice_v
+
+mc_h:
+  type: multichoice
+  widget: choice_h
+
+# db_upload - upload slot that stores data in our database
+db_upload:
+  type: upload
+  store_class: 'SD::Slot::Upload::Store::Database'
+
+# datepicker - date slot with jQuery datepicker
+datepicker:
+  type: date
+  widget: datepicker
+  class: datepicker
+
+#
+# Often used
+#
+
+# yes_no - choice with yes or no
+yes_no:
+  type: choice
+  widget: choice_v
+  options:
+    - Yes
+    - No
+
+#
+# Stubs for larger widgets
+#
+
+# tree - org_tree_expand select type with sane check and options subs
+tree:
+  type: choice
+  widget: org_tree_expand
+  check: |
+    sub {
+       my ($self, $item) = @_;
+       unless($item =~ /^\d+$/ && $item >= 1 && $item <= scalar @{ $self->options } ){
+           die E->new("Not one of allowed responses");
+       }
+       return 1;
+    }
+  options: |
+    sub {
+      my $self = shift;
+      use Data::Rmap qw/:all/;
+      return [ rmap_to {
+        return cut( $_->{text} ) if (ref $_ eq 'HASH');
+        return $_ unless ref $_;
+        return shift->recurse;
+      } HASH|ARRAY|VALUE, @{$self->tree} ];
+    }
+
+
+# ranking - a record slot that handles 'rank the following' type questions
+ranking:
+  type: record
+  mandatory: |
+    sub {
+      my $self = shift;
+      return 1 unless defined $_[0];
+      return ! $self->normalize(@_);
+    }
+  # XXX: normalize is depreciated, but.. currently there is no simple
+  # way to override the check sub to run code after the subslot validation
+  normalize: |
+    sub {
+      my( $self, $val ) = @_;
+      my %val_counts;
+      for my $slt ( @{ $self->columns } ) {
+        next if ! exists $val->{ $slt->name }; # Should this be var_name
+        my $v = $val->{ $slt->name };
+        next if (! defined $v || $v =~ /^\s*$/);
+        if ( $val_counts{$v}++ ) {
+          die E->new("More than one criterion has the same ranking ($v)");
+        }
+      }
+      unless ( scalar keys %val_counts == $self->columns->[0]->max_val ) {
+        die E::Skip->new("You must rank the criterion from ".
+          $self->columns->[0]->min_val." to ".$self->columns->[0]->max_val );
+      }
+      return 1;
+    }
+
+
+# You can add more here
+
+---
+start:
+  qns:
+    - heading: Start here
+
+---
+PAGE_log__book_1:
+  next: redirect_to_admin
+  portal: redirect_to_admin
+  nav_actions:
+    portal: 1
+    next: 1
+    show: 1
+  nav:
+    - next: Complete Form
+    - portal: Back to Portal
+
+# 'Log book'
+  qns:
+    - heading: "Log book"
+
+    - text: |
+        <p>Clinical work (including patient contact, care coordination, care package research, and related admin)</p>
+        <p>Trial work (waiting room recruitment, contacting patients for follow-up surveys, meetings, reporting, GP emails)</p>
+      html: 1
+
+
+    - slot:
+        name: shift
+        class: shift-log log-book
+        start_rows: 1
+        extendable: 1
+        widget: multi_list
+        type: multi
+        button: Shift
+        element:
+         slot:
+          name: log
+          type: record
+          label:
+            text: Shift [% loop.count %]
+            tt2: 1
+          headings: |
+            sub { my $self = shift; map { $_->label || undef } @{$self->columns} }
+          columns:
+            - slot:
+                name: shift_date
+                label:
+                  text: Date <br />(dd/mm/yyyy)
+                  html: 1
+                type: text
+                size: 10
+            - slot:
+                name: clinical_work
+                instructions: Please enter numbers only
+                label:
+                  text: Clinical work <br />(hrs)
+                  html: 1
+                type: real
+                size: 4
+            - slot:
+                name: trial_work
+                instructions: Please enter numbers only
+                label:
+                  text: Trial work <br />(hrs)
+                  html: 1
+                type: real
+                size: 4
+            - slot:
+                name: other
+                instructions: Please enter numbers only
+                label:
+                  text: Other <br />(hrs)
+                  html: 1
+                type: real
+                size: 4
+            - slot:
+                name: other_specify
+                label:
+                  text: Other <br />(specify)
+                  html: 1
+                type: text
+                size: 20
+
+
+---
+last:
+  nav:
+    - first: Start
+    - prev: Prev
+    - next: Submit
+  next: sub { $_[1]->set(completed=>time()); 'completed' }
+  percent: 99
+  qns:
+    - text: "[% PROCESS last %]"
+      tt2: 1
+
+---
+redirect_to_admin:
+    template: 'back-to-admin-site'

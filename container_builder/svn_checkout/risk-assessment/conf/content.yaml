@@ -1,0 +1,817 @@
+# Prototypes
+c_v:
+  type: choice
+  widget: choice_v
+
+c_h:
+  type: choice
+  widget: choice_h
+
+mc_v:
+  type: multichoice
+  widget: choice_v
+  check: |
+        sub {
+            my ($slot, $value)  = @_;
+            my %answer          = map {$_ => 1} @{$value};
+            my $text_value;
+            my $open_value;
+            if ( defined $slot->open ) {
+              foreach (@{$value}) {
+                if (/\D/ || $_ >= @{$slot->options}) {
+                  $text_value += 1;
+                }
+              }
+              foreach (@{$slot->open}) {
+                if (exists $answer{$_}) {
+                  $open_value += 1;
+                }
+              }
+              if ($text_value != $open_value) {
+                die E->new( "A response is required" );
+                return 0;
+              }
+              return 1;
+            } else {
+              return 1;
+            }
+          }
+
+mc_h:
+  type: multichoice
+  widget: choice_h
+
+# db_upload - upload slot that stores data in our database
+db_upload:
+  type: upload
+  store_class: 'SD::Slot::Upload::Store::Database'
+
+# datepicker - date slot with jQuery datepicker
+datepicker:
+  type: date
+  widget: datepicker
+  class: datepicker
+
+#
+# Often used
+#
+
+# yes_no - choice with yes or no
+yes_no:
+  type: choice
+  widget: choice_v
+  options:
+    - Yes
+    - No
+
+#
+# Stubs for larger widgets
+#
+
+# tree - org_tree_expand select type with sane check and options subs
+tree:
+  type: choice
+  widget: org_tree_expand
+  check: |
+    sub {
+       my ($self, $item) = @_;
+       unless($item =~ /^\d+$/ && $item >= 1 && $item <= scalar @{ $self->options } ){
+           die E->new("Not one of allowed responses");
+       }
+       return 1;
+    }
+  options: |
+    sub {
+      my $self = shift;
+      use Data::Rmap qw/:all/;
+      return [ rmap_to {
+        return cut( $_->{text} ) if (ref $_ eq 'HASH');
+        return $_ unless ref $_;
+        return shift->recurse;
+      } HASH|ARRAY|VALUE, @{$self->tree} ];
+    }
+
+
+# ranking - a record slot that handles 'rank the following' type questions
+ranking:
+  type: record
+  mandatory: |
+    sub {
+      my $self = shift;
+      return 1 unless defined $_[0];
+      return ! $self->normalize(@_);
+    }
+  # XXX: normalize is depreciated, but.. currently there is no simple
+  # way to override the check sub to run code after the subslot validation
+  normalize: |
+    sub {
+      my( $self, $val ) = @_;
+      my %val_counts;
+      for my $slt ( @{ $self->columns } ) {
+        next if ! exists $val->{ $slt->name }; # Should this be var_name
+        my $v = $val->{ $slt->name };
+        next if (! defined $v || $v =~ /^\s*$/);
+        if ( $val_counts{$v}++ ) {
+          die E->new("More than one criterion has the same ranking ($v)");
+        }
+      }
+      unless ( scalar keys %val_counts == $self->columns->[0]->max_val ) {
+        die E::Skip->new("You must rank the criterion from ".
+          $self->columns->[0]->min_val." to ".$self->columns->[0]->max_val );
+      }
+      return 1;
+    }
+
+
+# You can add more here
+
+email_check:
+  type: text
+  input_type: email
+  widget: textfield
+  size: 80
+  check: |
+    sub {
+      my $self = shift;
+
+      if ($self->exists(@_)) {
+        die E->new("Email already exists");
+      }
+      # Normalize
+      my $email = Email::Valid->address( -address => lc $_[0], -mxcheck => 1 );
+      if ( ! $email ) {
+        die E->new( "You must supply a valid email address (not $_[0])" );
+      }
+      $_[0] = $email;
+      return !! $email;
+    }
+
+phone_check:
+  type: int
+  class: consent
+  min_val: 0
+  max_val: 9999999999
+#  mandatory: 1
+  check: |
+    sub {
+      my $self = shift;
+      $self->super(@_);
+
+      if ($self->exists(@_)) {
+        die E->new("Phone number already exists");
+      }
+
+      my $val = shift;
+
+      my $area_code = substr($val, 0, 2);
+      # Converting international prefix of 61 to 0
+      my $new_number;
+      if ($area_code == "61") {
+        $new_number = substr($val, 0, 2, "0");
+        $area_code  = substr($val, 0, 2);
+      }
+      my $length = length($val);
+      if ( ($length < 10) || ($length > 10) ) {
+        die E->new( "The mobile phone number supplied is incorrect, must be 10 digits" );
+      }
+      return 1;
+    }
+
+
+k10_scale:
+  type: choice
+  widget: choice_v
+  options:
+    - None of the time
+    - A little of the time
+    - Some of the time
+    - Most of the time
+    - All of the time
+
+
+---
+start:
+  portal: redirect_to_admin
+  nav_actions:
+    portal: 1
+    next: 1
+    prev: 0
+    show: 1
+  nav:
+    - next: Next
+    - portal: Back to Portal
+
+# Risk Assessment
+  qns:
+    - heading: Risk Assessment
+    - text: "[% PROCESS 'crud-summary-header' IF summary_view %]"
+      tt2: 1
+
+    - text: |
+        [% survey_session = conf.fetch_session(session.get('survey_session_key'), 'survey') %]
+        <div class="infobox">
+          Patient name: [% session.get('firstname') || survey_session.get('firstname') %] [% session.get('surname') || survey_session.get('surname') %]<br/>
+          Phone: [% session.get('phone') || survey_session.get('phone') %]<br/>
+          Email: [% session.get('email') || survey_session.get('email') %]<br/>
+          Address: [% session.get('address') || survey_session.get('address') %]<br/>
+          GP name: [% session.get('gp') || 'N/A' %]<br/>
+        </div>
+        <p>You indicated in the Link-me iPad survey that you have been bothered by thoughts that you would be better off dead or of hurting yourself in some way.</p>
+      tt2: 1
+
+    - slot:
+        name: feeling_suicidal
+        label: Are you currently feeling that way?
+        type: c_v
+        options:
+          - Yes
+          - No
+          - Unable to contact patient
+        mandatory: 1
+
+  switch:
+    var: feeling_suicidal
+    cases:
+      1: PAGE_risk_assessment_2
+      3: PAGE_risk_assessment_6_last
+      default: PAGE_risk_assessment_1
+
+---
+PAGE_risk_assessment_1:
+  portal: redirect_to_admin
+  nav_actions:
+    portal: 1
+    next: 1
+    prev: 1
+    show: 1
+  nav:
+    - next: Next
+    - prev: Prev
+    - portal: Back to Portal
+# Risk Assessment
+  qns:
+    - heading: Risk Assessment
+    - slot:
+        name: comfortable_raising_gp
+        label: If you did feel that way [suicidal] again, would you feel comfortable raising this with your GP?
+        type: textarea
+        rows: 4
+        cols: 80
+
+    - slot:
+        name: someone_talk
+        label: Do you have someone else you can talk to if you feel like this again? A health professional or a family member or friend?
+        type: textarea
+        rows: 4
+        cols: 80
+
+    - slot:
+        name: email_sent
+        label: Do you still have the email we sent you, with the list of helplines and websites?
+        type: textarea
+        rows: 4
+        cols: 80
+
+    - slot:
+        name: consider_services
+        label: If you did feel [suicidal] again, would you consider using any of the services on there?
+        type: textarea
+        rows: 4
+        cols: 80
+
+  next: PAGE_risk_assessment_5_last
+
+---
+PAGE_risk_assessment_2:
+  portal: redirect_to_admin
+  nav_actions:
+    portal: 1
+    next: 1
+    prev: 1
+    show: 1
+  nav:
+    - next: Next
+    - prev: Prev
+    - portal: Back to Portal
+# Risk Assessment
+  qns:
+    - heading: Risk Assessment
+
+    - widget: following_questions
+      label: In the past month, have you made any plans or considered a method that you might use to harm yourself?
+      qn:
+        slot:
+          name: past_month_harm
+          type: yes_no
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: past_month_harm_following
+            label: What plans or methods have you considered? Is the method you would use readily available?
+            type: textarea
+            rows: 4
+            cols: 80
+
+
+    - widget: following_questions
+      label: Have you ever attempted to harm yourself?
+      qn:
+        slot:
+          name: ever_attempted_harm
+          type: yes_no
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: ever_attempted_harm_following
+            label: When was this? What happened?
+            type: textarea
+            rows: 4
+            cols: 80
+
+
+
+    - widget: following_questions
+      label: "There's a big difference between having a thought and acting on it. Do you think you might actually make an attempt to hurt yourself in the near future?"
+      qn:
+        slot:
+          name: actually_attempt_hurt
+          type: yes_no
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: actually_attempt_hurt_following
+            label: Can you be specific about how you might do this? Is the method you would use readily available?
+            type: textarea
+            rows: 4
+            cols: 80
+
+
+    - widget: following_questions
+      label: In the past month, have you told anyone that you were going to commit suicide, or threatened that you might do it?
+      qn:
+        slot:
+          name: told_anyone
+          type: yes_no
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: told_anyone_following
+            label: Who have you told and what have you said to them?
+            type: textarea
+            rows: 4
+            cols: 80
+
+
+    - widget: following_questions
+      label: Do you think there is any risk that you might hurt yourself before you see your doctor or counsellor the next time?
+      qn:
+        slot:
+          name: any_risk_hurt
+          type: yes_no
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: any_risk_hurt_following
+            label: What do you think you might do?
+            type: textarea
+            rows: 4
+            cols: 80
+
+    - slot:
+        name: navigator_comments
+        label:
+          text: |
+            <p>Navigator: record additional comments here<br/>
+            <em>Consider risk and protective factors: history of suicidal behaviour, medical conditions, insight, mental state, recent major life events, support network, links with health services, substance abuse</em>
+            </p>
+          html: 1
+        type: textarea
+        rows: 4
+        cols: 80
+
+
+  next: |
+      sub {
+        my ($page, $session) = @_;
+        my $attempt = $session->get('actually_attempt_hurt');
+         my $risk = $session->get('any_risk_hurt');
+
+        if ( $attempt == 1 || $risk == 1 ) {
+           return 'PAGE_risk_assessment_3';
+        } else {
+           return 'PAGE_risk_assessment_5_last';
+        }
+      }
+
+
+
+
+
+---
+PAGE_risk_assessment_3:
+  portal: redirect_to_admin
+  nav_actions:
+    portal: 1
+    next: 1
+    prev: 1
+    show: 1
+  nav:
+    - next: Next
+    - prev: Prev
+    - portal: Back to Portal
+# Risk Assessment
+  qns:
+    - heading: Risk Assessment
+
+    - text: |
+        <p>It sounds like things are pretty difficult for you at the moment. I need to let your GP know what we've talked about today, and I'd suggest that you make an appointment to see him/her.</p>
+        <p>Can I also remind you about the list of other services we emailed to you. They all provide free and confidential support so if your GP isn't available or you don't feel comfortable talking to him/her, you might like to call one of the numbers on that list.</p>
+      html: 1
+
+
+
+---
+PAGE_risk_assessment_4_last:
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $conf           = SD::Config->load;
+      my $parent_session = $conf->{fetch_session}->($session->get('parent_session'), 'patient');
+      my $complete_time  = time();
+
+      if (!$session->get('risk_assessment_complete')) {
+        $parent_session->set(risk_assessment_complete => $complete_time);
+      }
+
+      $session->set(considered_complete => $complete_time);
+      return 'redirect_to_admin';
+    }
+  portal: redirect_to_admin
+  nav_actions:
+    portal: 1
+    next: 1
+    prev: 1
+    show: 1
+  nav:
+    - next: Complete Form
+    - prev: Prev
+    - portal: Back to Portal
+# Risk Assessment
+  qns:
+    - heading: Risk Assessment
+
+    - text: |
+        <p><strong>Care navigator: Alert practice to your risk assessment with this patient <u>both</u> verbally and in writing (copy and paste the template below).</strong></p>
+        <div class="infobox consent">
+          <p>Dear Dr [name]</p>
+          <p>RE: Patient name, DOB</p>
+          <p>[Patient] is taking part in the Link-me trial which is testing a new model of stepped mental health care. In the iPad survey he/she completed on [date], he/she indicated thoughts of self-harm nearly every day and in line with the Link-me trial protocol I contacted him/her for a structured risk assessment.</p>
+          <p>In this assessment [patient] indicated that he/she has a plan and considers him/herself at risk of acting on it in the near future / before he/she next sees you.</p>
+          <p>I am writing to inform you of [patient]’s current difficulties and trust you will form your own impressions when you see him/her. You will be aware that every patient taking part in Link-me is emailed a list of emergency contact numbers such as Lifeline. If you would like to discuss this assessment or the Link-me trial in more detail please let me know.</p>
+          <p>[Care Navigator name], Link-me Care Navigator</p>
+        </div>
+      html: 1
+
+    - text: |
+        <h3>DETAILS OF RISK ASSESSMENT COMMUNICATION</h3>
+        <p>Written documentation</p>
+      html: 1
+
+    - widget: multi_textbox_table
+      headings:
+        - Date
+        - Time (HHMM)
+        - 
+        - Format
+      html: 1
+      rows:
+        -
+          - slot:
+              name: written_communication_date
+              type: date
+              picker: none
+          - slot:
+              name: written_communication_time_hr
+              type: select
+              options:
+                - 00
+                - 01
+                - 02
+                - 03
+                - 04
+                - 05
+                - 06
+                - 07
+                - 08
+                - 09
+                - 10
+                - 11
+                - 12
+                - 13
+                - 14
+                - 15
+                - 16
+                - 17
+                - 18
+                - 19
+                - 20
+                - 21
+                - 22
+                - 23
+          - slot:
+              name: written_communication_time_min
+              type: select
+              options:
+                - 00
+                - 01
+                - 02
+                - 03
+                - 04
+                - 05
+                - 06
+                - 07
+                - 08
+                - 09
+                - 10
+                - 11
+                - 12
+                - 13
+                - 14
+                - 15
+                - 16
+                - 17
+                - 18
+                - 19
+                - 20
+                - 21
+                - 22
+                - 23
+                - 24
+                - 25
+                - 26
+                - 27
+                - 28
+                - 29
+                - 30
+                - 31
+                - 32
+                - 33
+                - 34
+                - 35
+                - 36
+                - 37
+                - 38
+                - 39
+                - 40
+                - 41
+                - 42
+                - 43
+                - 44
+                - 45
+                - 46
+                - 47
+                - 48
+                - 49
+                - 50
+                - 51
+                - 52
+                - 53
+                - 54
+                - 55
+                - 56
+                - 57
+                - 58
+                - 59
+          - slot:
+              name: written_communication_format
+              type: textarea
+              rows: 2
+              cols: 20
+
+    - text: |
+        <p>Verbal communication  </p>
+      html: 1
+
+    - widget: multi_textbox_table
+      headings:
+        - Date
+        - Time (HHMM)
+        - 
+        - Spoke to
+      html: 1
+      rows:
+        -
+          - slot:
+              name: verbal_communication_date
+              type: date
+              picker: none
+          - slot:
+              name: verbal_communication_time_hr
+              type: select
+              options:
+                - 00
+                - 01
+                - 02
+                - 03
+                - 04
+                - 05
+                - 06
+                - 07
+                - 08
+                - 09
+                - 10
+                - 11
+                - 12
+                - 13
+                - 14
+                - 15
+                - 16
+                - 17
+                - 18
+                - 19
+                - 20
+                - 21
+                - 22
+                - 23
+          - slot:
+              name: verbal_communication_time_min
+              type: select
+              options:
+                - 00
+                - 01
+                - 02
+                - 03
+                - 04
+                - 05
+                - 06
+                - 07
+                - 08
+                - 09
+                - 10
+                - 11
+                - 12
+                - 13
+                - 14
+                - 15
+                - 16
+                - 17
+                - 18
+                - 19
+                - 20
+                - 21
+                - 22
+                - 23
+                - 24
+                - 25
+                - 26
+                - 27
+                - 28
+                - 29
+                - 30
+                - 31
+                - 32
+                - 33
+                - 34
+                - 35
+                - 36
+                - 37
+                - 38
+                - 39
+                - 40
+                - 41
+                - 42
+                - 43
+                - 44
+                - 45
+                - 46
+                - 47
+                - 48
+                - 49
+                - 50
+                - 51
+                - 52
+                - 53
+                - 54
+                - 55
+                - 56
+                - 57
+                - 58
+                - 59
+          - slot:
+              name: verbal_communication_format
+              type: textarea
+              rows: 2
+              cols: 20
+
+    - slot:
+        name: additional_comments
+        label: Additional comments
+        type: textarea
+        rows: 2
+        cols: 60
+
+
+
+
+---
+PAGE_risk_assessment_5_last:
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $conf           = SD::Config->load;
+      my $parent_session = $conf->{fetch_session}->($session->get('parent_session'), 'patient');
+      my $complete_time  = time();
+
+      if (!$session->get('risk_assessment_complete')) {
+        $parent_session->set(risk_assessment_complete => $complete_time);
+      }
+
+      $session->set(considered_complete => $complete_time);
+      return 'redirect_to_admin';
+    }
+  portal: redirect_to_admin
+  nav_actions:
+    portal: 1
+    next: 1
+    prev: 1
+    show: 1
+  nav:
+    - next: Complete Form
+    - prev: Prev
+    - portal: Back to Portal
+# Risk Assessment
+  qns:
+    - heading: Risk Assessment
+
+    - text: |
+        <p>It sounds like you've had some tough times but it's great to hear you're managing ok at the moment. If you feel like you need extra support your GP is here to help. You also have an email from us with some other services that provide free and confidential support.</p>
+        <p><strong>Care navigator: No further action required.</strong></p>
+      html: 1
+
+
+---
+PAGE_risk_assessment_6_last:
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $conf           = SD::Config->load;
+      my $parent_session = $conf->{fetch_session}->($session->get('parent_session'), 'patient');
+      my $complete_time  = time();
+
+      if (!$session->get('risk_assessment_complete')) {
+        $parent_session->set(risk_assessment_complete => $complete_time);
+      }
+
+      $session->set(considered_complete => $complete_time);
+      return 'redirect_to_admin';
+    }
+  portal: redirect_to_admin
+  nav_actions:
+    portal: 1
+    next: 1
+    prev: 1
+    show: 1
+  nav:
+    - next: Complete Form
+    - prev: Prev
+    - portal: Back to Portal
+# Risk Assessment
+  qns:
+    - heading: Risk Assessment
+
+    - text: |
+        <p><strong>Care navigator: Inform GP using the template below. </strong></p>
+        <div class="infobox consent">
+          <p>Dear Dr [name]</p>
+          <p>RE: Patient name, DOB</p>
+          <p>[Patient] is taking part in the Link-me trial which is testing a new model of stepped mental health care. In the iPad survey he/she completed on [date] indicated thoughts of self-harm nearly every day. Whilst there is a big difference between having a thought and acting on it, in line with the Link-me trial protocol we attempted to contact him/her for a structured risk assessment.</p>
+          <p>We were unable to contact [patient] on the number he/she provided but you will be aware that every patient taking part in Link-me is emailed a list of emergency contact numbers such as Lifeline. You may wish to follow up with the patient regarding his/her mental health.</p>
+          <p>[Care Navigator name], Link-me Care Navigator</p>
+        </div>
+      html: 1
+
+
+
+---
+last:
+  nav:
+    - first: Start
+    - prev: Prev
+    - next: Submit
+  next: sub { $_[1]->set(completed=>time()); 'completed' }
+  percent: 99
+  qns:
+    - text: "[% PROCESS last %]"
+      tt2: 1
+
+---
+redirect_to_admin:
+    template: 'back-to-admin-site'

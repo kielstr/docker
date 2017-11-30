@@ -1,0 +1,5 @@
+session_key,username,password,phn,practice,patient_id_prefix,next_patient_id,email,:sha1-digest
+t1,t1,ut=3R6vg,"Brisbane North","Brisbane Practice",BN,1,,7ee85f5169e6de8a2819cb5db6e1f4ce14c74a5b
+t2,t2,6w$$MCaB,"North Western Melbourne","High Street Medical and Dental Centre Preston",NW,1,,b384c9f2b9869647d68305b6892d61514c72a6d4
+t3,t3,qV3@hL74,"North Coast","Coffs Harbour",NCCOFFS,1,,5c433c2982315ab5d1c1898dabac93e658537299
+t4,t4,uE5RWu%?,"North Coast","Port Macquarie",NCPORT,1,,eb98f6d92da804d8610f870e1de4a00000ff0dee

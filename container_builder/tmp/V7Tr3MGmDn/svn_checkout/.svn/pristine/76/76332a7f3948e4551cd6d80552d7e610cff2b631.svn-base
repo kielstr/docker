@@ -1,0 +1,32 @@
+[% html_class = "summary" %]
+[% conf.banner_heading = 'Summary View' %]
+
+[%
+  patient_session_key = args.SD_KEY;
+  patient_session     = conf.fetch_session(patient_session_key, 'patient');
+  survey_session      = conf.fetch_session(patient_session.get('survey_session_key'), 'survey');
+
+  start_page = 'PAGE_care_nav_treatment_1';
+  last_page   = '(PAGE_care_nav_treatment_11|PAGE_care_nav_treatment_12)';
+
+  page_objects = conf.walk_between_pages(patient_session, start_page, last_page);
+%]
+
+<h1 class="hide_on_print">Summary View</h1>
+<div class="infobox infobox-print">
+  Patient name: [% survey_session.get('firstname') %] [% survey_session.get('surname') %]<br/>
+  Date of birth: [% survey_session.get('dob') || 'N/A' %]<br/>
+  Phone: [% survey_session.get('phone') || 'N/A' %]<br/>
+  Email: [% survey_session.get('email') || 'N/A' %]<br/>
+  Address: [% survey_session.get('address') || 'N/A' %]<br/>
+</div>
+
+<input class="hide_on_print" type="button" value="Print" onClick="window.print()">
+
+[%
+  FOREACH page_object IN page_objects;
+    NEXT IF page_object.summary_view == 0;
+    '<span id="' _ page_object.name _ '"></span>';
+    INCLUDE 'summary_page.tt2' summary_view=1 widget_set='summary' session=patient_session page=page_object;
+  END;
+%]

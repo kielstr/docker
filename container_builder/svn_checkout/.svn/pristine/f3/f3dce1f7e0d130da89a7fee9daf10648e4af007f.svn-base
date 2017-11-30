@@ -1,0 +1,1485 @@
+---
+Brisbane North:
+  activities:
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: The MindSpot pain course asssists people with chronic pain to
+      manage their physical and emotional health
+    resource_link: https://mindspot.org.au/pain-course
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: Track symptoms, treatments, triggers, and connect with the online
+      community
+    resource_link: http://flaredown.com/
+    resource_mode: Mobile app
+    resource_name: Flaredown
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: Improve your mental and physical health with free or low cost
+      fitness, sport and recreation activities
+    resource_link: https://www.brisbane.qld.gov.au/whats-on/events-listed-type/sports-recreation-programs/fitness-strength-activities#/?i=2
+    resource_mode: Near me
+    resource_name: Brisbane City Council
+  anxiety:
+  - id: anxiety
+    location: ~
+    priority: Anxiety / worry
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: anxiety
+    location: ~
+    priority: Anxiety / worry
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: anxiety
+    location: ~
+    priority: Anxiety / worry
+    resource_details: Learn to calm your mind and build mental health and wellbeing
+      through mindfulness-based tools
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: anxiety
+    location: ~
+    priority: Anxiety / worry
+    resource_details: Provides a chance to talk with others about mental health and
+      wellbeing difficulties, share experiences, and support each other
+    resource_link: https://www.grow.org.au/qld/
+    resource_mode: Near me
+    resource_name: Grow
+  appetite:
+  - id: appetite
+    location: ~
+    priority: Appetite
+    resource_details: Provides free online assessment and treatment for people troubled
+      by problems with appetite and other symptoms of anxiety or depression
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: appetite
+    location: ~
+    priority: Appetite
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: appetite
+    location: ~
+    priority: Appetite
+    resource_details: 'Provides guidance on mindful eating which may have benefits
+      whether you are eating too much or too little '
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: appetite
+    location: ~
+    priority: Appetite
+    resource_details: Offers a whole system approach to nutrition, with consultations
+      ranging from $12-$20
+    resource_link: https://www.wellnationclinics.com.au/treatments/nutritional-medicine
+    resource_mode: Near me
+    resource_name: 'Wellnation Clinic (Endeavour College Student clinic) '
+  concentration:
+  - id: concentration
+    location: ~
+    priority: Concentration / attention
+    resource_details: Provides free online assessment and treatment for people troubled
+      by problems with concentration and other symptoms of anxiety or depression
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: concentration
+    location: ~
+    priority: Concentration / attention
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: concentration
+    location: ~
+    priority: Concentration / attention
+    resource_details: Learn to focus your mind through short mindfulness training
+      exercises
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: concentration
+    location: ~
+    priority: Concentration / attention
+    resource_details: Grow members talk about their experiences and support each other
+      with their mental illness journey. Free
+    resource_link: https://www.grow.org.au/qld/
+    resource_mode: Near me
+    resource_name: Grow
+  death:
+  - id: death
+    location: ~
+    priority: Thoughts of death
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: death
+    location: ~
+    priority: Thoughts of death
+    resource_details: Provides immediate support to anyone feeling suicidal, and longer
+      term support through up to six free telephone counselling sessions. Call 1300
+      658 467.
+    resource_link: https://www.suicidecallbackservice.org.au/
+    resource_mode: Telephone
+    resource_name: Suicide Call Back Service
+  - id: death
+    location: ~
+    priority: Thoughts of death
+    resource_details: Allows you to create a safety plan that you can work through
+      when you're experiencing suicidal thoughts
+    resource_link: https://www.beyondblue.org.au/get-support/beyondnow-suicide-safety-planning/
+    resource_mode: Mobile app
+    resource_name: BeyondNow
+  - id: death
+    location: ~
+    priority: Thoughts of death
+    resource_details: Provides a chance to talk with others about mental health and
+      wellbeing difficulties, share experiences, and support each other
+    resource_link: https://www.grow.org.au/qld/
+    resource_mode: Near me
+    resource_name: Grow
+  economy:
+  - id: economy
+    location: ~
+    priority: Household economy
+    resource_details: Provides financial guidance, tools, and resources
+    resource_link: https://www.moneysmart.gov.au/
+    resource_mode: Online
+    resource_name: MoneySmart
+  - id: economy
+    location: ~
+    priority: Household economy
+    resource_details: Provides free financial counselling. Call 1800 007 007 between
+      9:30am and 4:30pm, Monday to Friday
+    resource_link: http://www.ndh.org.au/
+    resource_mode: Telephone
+    resource_name: National Debt Helpline
+  - id: economy
+    location: ~
+    priority: Household economy
+    resource_details: Includes a budget planner and personal finance software
+    resource_link: https://getpocketbook.com/
+    resource_mode: Mobile app
+    resource_name: Pocketbook
+  - id: economy
+    location: ~
+    priority: Household economy
+    resource_details: Provides free and confidential financial counselling for people
+      facing financial difficulties or wanting to avoid financial difficulties in
+      the future. Follow the link to find an office near you.
+    resource_link: https://salvos.org.au/need-help/financial-assistance/financial-counselling/
+    resource_mode: Near me
+    resource_name: MoneyCare
+  energy:
+  - id: energy
+    location: ~
+    priority: Energy
+    resource_details: Provides free online assessment and treatment for people troubled
+      by problems with energy and other symptoms of anxiety or depression
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: energy
+    location: ~
+    priority: Energy
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: energy
+    location: ~
+    priority: Energy
+    resource_details: Assists you to improve energy by establishing a good sleep/wake
+      routine that includes regular exercise and exposure to daylight
+    resource_link: https://au.reachout.com/tools-and-apps/recharge
+    resource_mode: Mobile app
+    resource_name: Recharge
+  - id: energy
+    location: ~
+    priority: Energy
+    resource_details: Improve your energy with free or low cost fitness, sport, and
+      recreation activities
+    resource_link: https://www.brisbane.qld.gov.au/whats-on/events-listed-type/sports-recreation-programs/fitness-strength-activities#/?i=2
+    resource_mode: Near me
+    resource_name: Brisbane City Council
+  generic:
+  - id: generic
+    location: ~
+    priority: Generic
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: generic
+    location: ~
+    priority: Generic
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: generic
+    location: ~
+    priority: Generic
+    resource_details: Build mental health and wellbeing through mindfulness-based
+      tools
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: generic
+    location: ~
+    priority: Generic
+    resource_details: Provides a chance to talk with others about mental health and
+      wellbeing difficulties, share experiences, and support each other
+    resource_link: https://www.grow.org.au/qld/
+    resource_mode: Near me
+    resource_name: Grow
+  health:
+  - id: health
+    location: ~
+    priority: Health
+    resource_details: A comprehensive program that provides instructions and tools
+      to help you learn new wellness strategies and put them into practice.
+    resource_link: https://www.mydigitalhealth.org.au/programs-available/
+    resource_mode: Online
+    resource_name: iChooseWell
+  - id: health
+    location: ~
+    priority: Health
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: health
+    location: ~
+    priority: Health
+    resource_details: Provides tools to help you manage your health. Check your symptoms,
+      find a health service, and get trusted health information.
+    resource_link: https://www.healthdirect.gov.au/health-app
+    resource_mode: Mobile app
+    resource_name: healthdirect
+  - id: health
+    location: ~
+    priority: Health
+    resource_details: Improve your mental and physical health with free or low cost
+      fitness, sport and recreation activities
+    resource_link: https://www.brisbane.qld.gov.au/whats-on/events-listed-type/sports-recreation-programs/fitness-strength-activities#/?i=2
+    resource_mode: Near me
+    resource_name: Brisbane City Council
+  image:
+  - id: image
+    location: ~
+    priority: Self-image
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: image
+    location: ~
+    priority: Self-image
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: image
+    location: ~
+    priority: Self-image
+    resource_details: 'Assists to improve self-esteem, body image, anxiety and mood
+      through '
+    resource_link: http://samuramu.com/goodblocks/
+    resource_mode: Mobile app
+    resource_name: Good Blocks
+  - id: image
+    location: ~
+    priority: Self-image
+    resource_details: Provides a chance to talk with others about mental health and
+      wellbeing difficulties, share experiences, and support each other
+    resource_link: https://www.grow.org.au/qld/
+    resource_mode: Near me
+    resource_name: Grow
+  interest:
+  - id: interest
+    location: ~
+    priority: Little interest or pleasure in doing things
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: interest
+    location: ~
+    priority: Little interest or pleasure in doing things
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: interest
+    location: ~
+    priority: Little interest or pleasure in doing things
+    resource_details: Sets simple and effective missions to help you achieve better
+      mental health
+    resource_link: http://moodmission.com/
+    resource_mode: Mobile app
+    resource_name: MoodMission
+  - id: interest
+    location: ~
+    priority: Little interest or pleasure in doing things
+    resource_details: Meet people with similar interests or get inspired to try something
+      new
+    resource_link: https://www.meetup.com/en-AU/find/?allMeetups=true&amp;radius=3&amp;userFreeform=Brisbane%2C+Australia&amp;mcId=c1000655&amp;change=yes&amp;sort=default
+    resource_mode: Near me
+    resource_name: MeetUp
+  mood:
+  - id: mood
+    location: ~
+    priority: Mood
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: mood
+    location: ~
+    priority: Mood
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: mood
+    location: ~
+    priority: Mood
+    resource_details: Build mental health and wellbeing through mindfulness-based
+      tools
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: mood
+    location: ~
+    priority: Mood
+    resource_details: Provides a chance to talk with others about mental health and
+      wellbeing difficulties, share experiences, and support each other
+    resource_link: https://www.grow.org.au/qld/
+    resource_mode: Near me
+    resource_name: Grow
+  movement:
+  - id: movement
+    location: ~
+    priority: Motor activity / movement
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: movement
+    location: ~
+    priority: Motor activity / movement
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: movement
+    location: ~
+    priority: Motor activity / movement
+    resource_details: Tell the app how you're feeling to receive a selection of simple
+      and effective missions that will help boost your activity levels
+    resource_link: http://moodmission.com/
+    resource_mode: Mobile app
+    resource_name: MoodMission
+  - id: movement
+    location: ~
+    priority: Motor activity / movement
+    resource_details: Provides a chance to talk with others about mental health and
+      wellbeing difficulties, share experiences, and support each other
+    resource_link: https://www.grow.org.au/qld/
+    resource_mode: Near me
+    resource_name: Grow
+  sleep:
+  - id: sleep
+    location: ~
+    priority: Sleep
+    resource_details: A six-module program including education, monitoring, practical
+      strategies to improve sleep, and relapse prevention
+    resource_link: https://www.mydigitalhealth.org.au/programs-available/
+    resource_mode: Online
+    resource_name: iSleepWell
+  - id: sleep
+    location: ~
+    priority: Sleep
+    resource_details: Provides free support from a trained coach; call 07 3358 4424
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: sleep
+    location: ~
+    priority: Sleep
+    resource_details: 'Mindfulness training with a sleep-specific module as well as
+      others that may assist in improving sleep (e.g., stress) '
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: sleep
+    location: ~
+    priority: Sleep
+    resource_details: Offers talks and courses to assist insomnia, depression, anxiety,
+      stress and more
+    resource_link: https://www.meetup.com/RELAXATION-CENTRE-OF-QUEENSLAND/
+    resource_mode: Near me
+    resource_name: Relaxation Centre of Queensland Meetup Group
+North Coast:
+  activities:
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: The MindSpot pain course asssists people with chronic pain to
+      manage their physical and emotional health
+    resource_link: https://mindspot.org.au/pain-course
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: Provides free support from a trained coach; call 1300 137 934
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: Track symptoms, treatments, triggers, and connect with the online
+      community
+    resource_link: http://flaredown.com/
+    resource_mode: Mobile app
+    resource_name: Flaredown
+  - id: activities
+    location: Coffs Harbour
+    priority: Activities of daily life
+    resource_details: Provides personalised plans to support you to reach your goals
+    resource_link: http://newhorizons.org.au/expertise/mental-health/
+    resource_mode: Near me
+    resource_name: New Horizons
+  - id: activities
+    location: Port Macquarie
+    priority: Activities of daily life
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  anxiety:
+  - id: anxiety
+    location: ''
+    priority: Anxiety / worry
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: anxiety
+    location: ''
+    priority: Anxiety / worry
+    resource_details: Provides free support from a trained coach; call 1300 137 934
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: anxiety
+    location: ''
+    priority: Anxiety / worry
+    resource_details: Learn to calm your mind and build mental health and wellbeing
+      through mindfulness-based tools
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: anxiety
+    location: Coffs Harbour
+    priority: Anxiety / worry
+    resource_details: Meet others struggling with anxiety; share experiences and solutions.
+      The group meets at 11am on the second and fourth Tuesdays of the month.
+    resource_link: http://coffsconnect.com.au/coffs-harbour-anxiety-support-group
+    resource_mode: Near me
+    resource_name: Coffs Harbour Anxiety Support Group
+  - id: anxiety
+    location: Port Macquarie
+    priority: Anxiety / worry
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  appetite:
+  - id: appetite
+    location: ''
+    priority: Appetite
+    resource_details: Provides free online assessment and treatment for people troubled
+      by problems with appetite and other symptoms of anxiety or depression
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: appetite
+    location: ''
+    priority: Appetite
+    resource_details: Free confidential telephone based expert advice to find a healthier,
+      happier you
+    resource_link: http://www.gethealthynsw.com.au/
+    resource_mode: Telephone
+    resource_name: Get healthy
+  - id: appetite
+    location: ''
+    priority: Appetite
+    resource_details: 'Provides guidance on mindful eating which may have benefits
+      whether you are eating too much or too little '
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: appetite
+    location: Coffs Harbour
+    priority: Appetite
+    resource_details: Provides support for people experiencing difficulties with their
+      mental health and wellbeing. This group meets at 11am on the first Thursday
+      of each month.
+    resource_link: http://coffsconnect.com.au/coffs-harbour-mental-health-and-wellbeing-support-group
+    resource_mode: Near me
+    resource_name: Coffs Harbour Mental Health and Wellbeing Support Group
+  - id: appetite
+    location: Port Macquarie
+    priority: Appetite
+    resource_details: ''
+    resource_link: ''
+    resource_mode: Near me
+    resource_name: ''
+  concentration:
+  - id: concentration
+    location: ''
+    priority: Concentration / attention
+    resource_details: Provides free online assessment and treatment for people troubled
+      by problems with concentration and other symptoms of anxiety or depression
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: concentration
+    location: ''
+    priority: Concentration / attention
+    resource_details: Provides free support from a trained coach; call 1300 137 934
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: concentration
+    location: ''
+    priority: Concentration / attention
+    resource_details: Learn to focus your mind through short mindfulness training
+      exercises
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: concentration
+    location: Coffs Harbour
+    priority: Concentration / attention
+    resource_details: Provides support for people experiencing difficulties with their
+      mental health and wellbeing. This group meets at 11am on the first Thursday
+      of each month.
+    resource_link: http://coffsconnect.com.au/coffs-harbour-mental-health-and-wellbeing-support-group
+    resource_mode: Near me
+    resource_name: Coffs Harbour Mental Health and Wellbeing Support Group
+  - id: concentration
+    location: Port Macquarie
+    priority: Concentration / attention
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  death:
+  - id: death
+    location: ''
+    priority: Thoughts of death
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: death
+    location: ''
+    priority: Thoughts of death
+    resource_details: Provides immediate support to anyone feeling suicidal, and longer
+      term support through up to six free telephone counselling sessions. Call 1300
+      658 467.
+    resource_link: https://www.suicidecallbackservice.org.au/
+    resource_mode: Telephone
+    resource_name: Suicide Call Back Service
+  - id: death
+    location: ''
+    priority: Thoughts of death
+    resource_details: Allows you to create a safety plan that you can work through
+      when you're experiencing suicidal thoughts
+    resource_link: https://www.beyondblue.org.au/get-support/beyondnow-suicide-safety-planning/
+    resource_mode: Mobile app
+    resource_name: BeyondNow
+  - id: death
+    location: Coffs Harbour
+    priority: Thoughts of death
+    resource_details: Provides support for people experiencing difficulties with their
+      mental health and wellbeing. This group meets at 11am on the first Thursday
+      of each month.
+    resource_link: http://coffsconnect.com.au/coffs-harbour-mental-health-and-wellbeing-support-group
+    resource_mode: Near me
+    resource_name: Coffs Harbour Mental Health and Wellbeing Support Group
+  - id: death
+    location: Port Macquarie
+    priority: Thoughts of death
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  economy:
+  - id: economy
+    location: ''
+    priority: Household economy
+    resource_details: Provides financial guidance, tools, and resources
+    resource_link: https://www.moneysmart.gov.au/
+    resource_mode: Online
+    resource_name: MoneySmart
+  - id: economy
+    location: ''
+    priority: Household economy
+    resource_details: Provides free financial counselling. Call 1800 007 007 between
+      9:30am and 4:30pm, Monday to Friday
+    resource_link: http://www.ndh.org.au/
+    resource_mode: Telephone
+    resource_name: National Debt Helpline
+  - id: economy
+    location: ''
+    priority: Household economy
+    resource_details: Includes a budget planner and personal finance software
+    resource_link: https://getpocketbook.com/
+    resource_mode: Mobile app
+    resource_name: Pocketbook
+  - id: economy
+    location: Coffs Harbour
+    priority: Household economy
+    resource_details: Provides free face-to-face financial counselling for anyone
+      who feels overwhelmed with money problems. Call 02 6651 4093 to make an appointment.
+    resource_link: https://www.lifeline.org.au/north-coast-nsw/counselling-services
+    resource_mode: Near me
+    resource_name: Lifeline
+  - id: economy
+    location: Port Macquarie
+    priority: Household economy
+    resource_details: ''
+    resource_link: ''
+    resource_mode: Near me
+    resource_name: ''
+  energy:
+  - id: energy
+    location: ''
+    priority: Energy
+    resource_details: Provides free online assessment and treatment for people troubled
+      by problems with energy and other symptoms of anxiety or depression
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: energy
+    location: ''
+    priority: Energy
+    resource_details: Free confidential telephone based expert advice to find a healthier,
+      happier you
+    resource_link: http://www.gethealthynsw.com.au/
+    resource_mode: Telephone
+    resource_name: Get healthy
+  - id: energy
+    location: ''
+    priority: Energy
+    resource_details: Assists you to improve energy by establishing a good sleep/wake
+      routine that includes regular exercise and exposure to daylight
+    resource_link: https://au.reachout.com/tools-and-apps/recharge
+    resource_mode: Mobile app
+    resource_name: Recharge
+  - id: energy
+    location: Coffs Harbour
+    priority: Energy
+    resource_details: Improve your energy levels by joining a local mental health
+      walking group -  follow the link and search for your postcode
+    resource_link: http://walking.heartfoundation.org.au/walking/find-walk
+    resource_mode: Near me
+    resource_name: Stroll Patrol
+  - id: energy
+    location: Port Macquarie
+    priority: Energy
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  generic:
+  - id: generic
+    location: ''
+    priority: Generic
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: generic
+    location: ''
+    priority: Generic
+    resource_details: Provides free support from a trained coach; call 1300 137 934
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: generic
+    location: ''
+    priority: Generic
+    resource_details: Build mental health and wellbeing through mindfulness-based
+      tools
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: generic
+    location: Coffs Harbour
+    priority: Generic
+    resource_details: Meet people with similar interests, get inspired to try something
+      new, or join a support group
+    resource_link: http://coffsconnect.com.au/community-groups
+    resource_mode: Near me
+    resource_name: CoffsConnect
+  - id: generic
+    location: Port Macquarie
+    priority: Generic
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  health:
+  - id: health
+    location: ''
+    priority: Health
+    resource_details: A comprehensive program that provides instructions and tools
+      to help you learn new wellness strategies and put them into practice.
+    resource_link: https://www.mydigitalhealth.org.au/programs-available/
+    resource_mode: Online
+    resource_name: iChooseWell
+  - id: health
+    location: ''
+    priority: Health
+    resource_details: Provides free support from a trained coach; call 1300 137 934
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: health
+    location: ''
+    priority: Health
+    resource_details: Provides tools to help you manage your health. Check your symptoms,
+      find a health service, and get trusted health information.
+    resource_link: https://www.healthdirect.gov.au/health-app
+    resource_mode: Mobile app
+    resource_name: healthdirect
+  - id: health
+    location: Coffs Harbour
+    priority: Health
+    resource_details: Improve your physical and mental health by joining a local mental
+      health walking group - follow the link and search for your postcode
+    resource_link: http://walking.heartfoundation.org.au/walking/find-walk/
+    resource_mode: Near me
+    resource_name: Stroll Patrol
+  - id: health
+    location: Port Macquarie
+    priority: Health
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  image:
+  - id: image
+    location: ''
+    priority: Self-image
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: image
+    location: ''
+    priority: Self-image
+    resource_details: Provides free support from a trained coach; call 1300 137 934
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: image
+    location: ''
+    priority: Self-image
+    resource_details: 'Assists to improve self-esteem, body image, anxiety and mood
+      through '
+    resource_link: http://samuramu.com/goodblocks/
+    resource_mode: Mobile app
+    resource_name: Good Blocks
+  - id: image
+    location: Coffs Harbour
+    priority: Self-image
+    resource_details: Provides support for people experiencing difficulties with their
+      mental health and wellbeing. This group meets at 11am on the first Thursday
+      of each month.
+    resource_link: http://coffsconnect.com.au/coffs-harbour-mental-health-and-wellbeing-support-group
+    resource_mode: Near me
+    resource_name: Coffs Harbour Mental Health and Wellbeing Support Group
+  - id: image
+    location: Port Macquarie
+    priority: Self-image
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  interest:
+  - id: interest
+    location: ''
+    priority: Little interest or pleasure in doing things
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: interest
+    location: ''
+    priority: Little interest or pleasure in doing things
+    resource_details: Provides free support from a trained coach; call 1300 137 934
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: interest
+    location: ''
+    priority: Little interest or pleasure in doing things
+    resource_details: Sets simple and effective missions to help you achieve better
+      mental health
+    resource_link: http://moodmission.com/
+    resource_mode: Mobile app
+    resource_name: MoodMission
+  - id: interest
+    location: Coffs Harbour
+    priority: Little interest or pleasure in doing things
+    resource_details: Meet people with similar interests, get inspired to try something
+      new, or join a support group
+    resource_link: http://coffsconnect.com.au/community-groups
+    resource_mode: Near me
+    resource_name: CoffsConnect
+  - id: interest
+    location: Port Macquarie
+    priority: Little interest or pleasure in doing things
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  mood:
+  - id: mood
+    location: ''
+    priority: Mood
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: mood
+    location: ''
+    priority: Mood
+    resource_details: Provides free support from a trained coach; call 1300 137 934
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: mood
+    location: ''
+    priority: Mood
+    resource_details: Build mental health and wellbeing through mindfulness-based
+      tools
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: mood
+    location: Coffs Harbour
+    priority: Mood
+    resource_details: Provides support for people experiencing difficulties with their
+      mental health and wellbeing. This group meets at 11am on the first Thursday
+      of each month.
+    resource_link: http://coffsconnect.com.au/coffs-harbour-mental-health-and-wellbeing-support-group
+    resource_mode: Near me
+    resource_name: Coffs Harbour Mental Health and Wellbeing Support Group
+  - id: mood
+    location: Port Macquarie
+    priority: Mood
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  movement:
+  - id: movement
+    location: ''
+    priority: Motor activity / movement
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: movement
+    location: ''
+    priority: Motor activity / movement
+    resource_details: Provides free support from a trained coach; call 1300 137 934
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: movement
+    location: ''
+    priority: Motor activity / movement
+    resource_details: Tell the app how you're feeling to receive a selection of simple
+      and effective missions that will help boost your activity levels
+    resource_link: http://moodmission.com/
+    resource_mode: Mobile app
+    resource_name: MoodMission
+  - id: movement
+    location: Coffs Harbour
+    priority: Motor activity / movement
+    resource_details: Improve your activity levels by joining a local mental health
+      walking group -  follow the link and search for your postcode
+    resource_link: http://walking.heartfoundation.org.au/walking/find-walk
+    resource_mode: Near me
+    resource_name: Stroll Patrol
+  - id: movement
+    location: Port Macquarie
+    priority: Motor activity / movement
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+  sleep:
+  - id: sleep
+    location: ''
+    priority: Sleep
+    resource_details: A six-module program including education, monitoring, practical
+      strategies to improve sleep, and relapse prevention
+    resource_link: https://www.mydigitalhealth.org.au/programs-available/
+    resource_mode: Online
+    resource_name: iSleepWell
+  - id: sleep
+    location: ''
+    priority: Sleep
+    resource_details: Provides free support from a trained coach; call 1300 137 934
+    resource_link: https://www.beyondblue.org.au/get-support/newaccess
+    resource_mode: Telephone
+    resource_name: New Access
+  - id: sleep
+    location: ''
+    priority: Sleep
+    resource_details: 'Mindfulness training with a sleep-specific module as well as
+      others that may assist in improving sleep (e.g., stress) '
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: sleep
+    location: Coffs Harbour
+    priority: Sleep
+    resource_details: Provides support for people experiencing difficulties with their
+      mental health and wellbeing. This group meets at 11am on the first Thursday
+      of each month.
+    resource_link: http://coffsconnect.com.au/coffs-harbour-mental-health-and-wellbeing-support-group
+    resource_mode: Near me
+    resource_name: Coffs Harbour Mental Health and Wellbeing Support Group
+  - id: sleep
+    location: Port Macquarie
+    priority: Sleep
+    resource_details: TBC
+    resource_link: TBC
+    resource_mode: Near me
+    resource_name: TBC
+North Western Melbourne:
+  activities:
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: The MindSpot pain course asssists people with chronic pain to
+      manage their physical and emotional health
+    resource_link: https://mindspot.org.au/pain-course
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: Track symptoms, treatments, triggers, and connect with the online
+      community
+    resource_link: http://flaredown.com/
+    resource_mode: Mobile app
+    resource_name: Flaredown
+  - id: activities
+    location: ~
+    priority: Activities of daily life
+    resource_details: Located in Footscray, this clinic provides individualised programs
+      for the management of chronic diseases and injuries. If you have a chronic medical
+      condition you may be eligible for Medicare funding
+    resource_link: https://www.vu.edu.au/about-vu/facilities-services/our-services/health-wellbeing-clinics/clinical-exercise-rehabilitation
+    resource_mode: Near me
+    resource_name: Victoria University Clinical Exercise &amp; Rehabilitation Clinic
+  anxiety:
+  - id: anxiety
+    location: ~
+    priority: Anxiety / worry
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: anxiety
+    location: ~
+    priority: Anxiety / worry
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: anxiety
+    location: ~
+    priority: Anxiety / worry
+    resource_details: Learn to calm your mind and build mental health and wellbeing
+      through mindfulness-based tools
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: anxiety
+    location: ~
+    priority: Anxiety / worry
+    resource_details: Provides support for people experiencing symptoms of anxiety
+      or depression. Meetings are held on weeknights in Altona, Camberwell, Coburg,
+      and Cranbourne. No bookings are required.  There is a small ($5) attendance
+      fee.
+    resource_link: 'https://www.adavic.org.au/PG-social-support-support-groups.aspx '
+    resource_mode: Near me
+    resource_name: Anxiety Disorders Association of Victoria (ADAVIC) support group
+  appetite:
+  - id: appetite
+    location: ~
+    priority: Appetite
+    resource_details: Provides free online assessment and treatment for people troubled
+      by problems with appetite and other symptoms of anxiety or depression
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: appetite
+    location: ~
+    priority: Appetite
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: appetite
+    location: ~
+    priority: Appetite
+    resource_details: 'Provides guidance on mindful eating which may have benefits
+      whether you are eating too much or too little '
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: appetite
+    location: ~
+    priority: Appetite
+    resource_details: Receive professional advice on managing problems with appetite
+      in St Albans or Melbourne CBD. Consultations are $30 or $20 for concession card
+      holders.
+    resource_link: https://www.vu.edu.au/about-vu/facilities-services/our-services/health-wellbeing-clinics/nutrition-clinic
+    resource_mode: Near me
+    resource_name: Victoria University Nutrition Clinic
+  concentration:
+  - id: concentration
+    location: ~
+    priority: Concentration / attention
+    resource_details: Provides free online assessment and treatment for people troubled
+      by problems with concentration and other symptoms of anxiety or depression
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: concentration
+    location: ~
+    priority: Concentration / attention
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: concentration
+    location: ~
+    priority: Concentration / attention
+    resource_details: Learn to focus your mind through short mindfulness training
+      exercises
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: concentration
+    location: ~
+    priority: Concentration / attention
+    resource_details: Provides support for people experiencing symptoms of anxiety
+      or depression. Meetings are held on weeknights in Altona, Camberwell, Coburg,
+      and Cranbourne. No bookings are required.  There is a small ($5) attendance
+      fee.
+    resource_link: https://www.adavic.org.au/PG-social-support-support-groups.aspx
+    resource_mode: Near me
+    resource_name: Anxiety Disorders Association of Victoria (ADAVIC) support group
+  death:
+  - id: death
+    location: ~
+    priority: Thoughts of death
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: death
+    location: ~
+    priority: Thoughts of death
+    resource_details: Provides immediate support to anyone feeling suicidal, and longer
+      term support through up to six free telephone counselling sessions. Call 1300
+      658 467.
+    resource_link: https://www.suicidecallbackservice.org.au/
+    resource_mode: Telephone
+    resource_name: Suicide Call Back Service
+  - id: death
+    location: ~
+    priority: Thoughts of death
+    resource_details: Allows you to create a safety plan that you can work through
+      when you're experiencing suicidal thoughts
+    resource_link: https://www.beyondblue.org.au/get-support/beyondnow-suicide-safety-planning/
+    resource_mode: Mobile app
+    resource_name: BeyondNow
+  - id: death
+    location: ~
+    priority: Thoughts of death
+    resource_details: Provides support for people experiencing symptoms of anxiety
+      or depression. Meetings are held on weeknights in Altona, Camberwell, Coburg,
+      and Cranbourne. No bookings are required.  There is a small ($5) attendance
+      fee.
+    resource_link: https://www.adavic.org.au/PG-social-support-support-groups.aspx
+    resource_mode: Near me
+    resource_name: Anxiety Disorders Association of Victoria (ADAVIC) support group
+  economy:
+  - id: economy
+    location: ~
+    priority: Household economy
+    resource_details: Provides financial guidance, tools, and resources
+    resource_link: https://www.moneysmart.gov.au/
+    resource_mode: Online
+    resource_name: MoneySmart
+  - id: economy
+    location: ~
+    priority: Household economy
+    resource_details: Provides free financial counselling. Call 1800 007 007 between
+      9:30am and 4:30pm, Monday to Friday
+    resource_link: http://www.ndh.org.au/
+    resource_mode: Telephone
+    resource_name: National Debt Helpline
+  - id: economy
+    location: ~
+    priority: Household economy
+    resource_details: Includes a budget planner and personal finance software
+    resource_link: https://getpocketbook.com/
+    resource_mode: Mobile app
+    resource_name: Pocketbook
+  - id: economy
+    location: ~
+    priority: Household economy
+    resource_details: Provides free financial counselling at several locations across
+      Melbourne. Call 9731 2500 for an appointment near you.
+    resource_link: https://www.anglicarevic.org.au/what-we-do/strengthening-communities/
+    resource_mode: Near me
+    resource_name: Anglicare
+  energy:
+  - id: energy
+    location: ~
+    priority: Energy
+    resource_details: Provides free online assessment and treatment for people troubled
+      by problems with energy and other symptoms of anxiety or depression
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: energy
+    location: ~
+    priority: Energy
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: energy
+    location: ~
+    priority: Energy
+    resource_details: Assists you to improve energy by establishing a good sleep/wake
+      routine that includes regular exercise and exposure to daylight
+    resource_link: https://au.reachout.com/tools-and-apps/recharge
+    resource_mode: Mobile app
+    resource_name: Recharge
+  - id: energy
+    location: ~
+    priority: Energy
+    resource_details: Improve your energy with an individualised exercise program.
+      Medicare subsidies and health insurance rebates are available.
+    resource_link: https://www.vu.edu.au/about-vu/facilities-services/our-services/health-wellbeing-clinics/clinical-exercise-rehabilitation
+    resource_mode: Near me
+    resource_name: Victoria University Clinical Exercise &amp; Rehabilitation Clinic
+  generic:
+  - id: generic
+    location: ~
+    priority: Generic
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: generic
+    location: ~
+    priority: Generic
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: generic
+    location: ~
+    priority: Generic
+    resource_details: Build mental health and wellbeing through mindfulness-based
+      tools
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: generic
+    location: ~
+    priority: Generic
+    resource_details: Meet people with similar interests or get inspired to try something
+      new
+    resource_link: https://www.meetup.com/en-AU/find/?allMeetups=true&amp;radius=3&amp;userFreeform=me&amp;mcId=c1000654&amp;change=yes&amp;sort=default
+    resource_mode: Near me
+    resource_name: MeetUp
+  health:
+  - id: health
+    location: ~
+    priority: Health
+    resource_details: A comprehensive program that provides instructions and tools
+      to help you learn new wellness strategies and put them into practice.
+    resource_link: https://www.mydigitalhealth.org.au/programs-available/
+    resource_mode: Online
+    resource_name: iChooseWell
+  - id: health
+    location: ~
+    priority: Health
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: health
+    location: ~
+    priority: Health
+    resource_details: Provides tools to help you manage your health. Check your symptoms,
+      find a health service, and get trusted health information.
+    resource_link: https://www.healthdirect.gov.au/health-app
+    resource_mode: Mobile app
+    resource_name: healthdirect
+  - id: health
+    location: ~
+    priority: Health
+    resource_details: Located in Footscray, this clinic provides individualised programs
+      for healthy people and those with chronic diseases and injuries. Medicare subsidies
+      and health insurance rebates are available.
+    resource_link: https://www.vu.edu.au/about-vu/facilities-services/our-services/health-wellbeing-clinics/clinical-exercise-rehabilitation
+    resource_mode: Near me
+    resource_name: Victoria University Clinical Exercise &amp; Rehabilitation Clinic
+  image:
+  - id: image
+    location: ~
+    priority: Self-image
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: image
+    location: ~
+    priority: Self-image
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: image
+    location: ~
+    priority: Self-image
+    resource_details: 'Assists to improve self-esteem, body image, anxiety and mood
+      through '
+    resource_link: http://samuramu.com/goodblocks/
+    resource_mode: Mobile app
+    resource_name: Good Blocks
+  - id: image
+    location: ~
+    priority: Self-image
+    resource_details: Provides support for people experiencing symptoms of anxiety
+      or depression. Meetings are held on weeknights in Altona, Camberwell, Coburg,
+      and Cranbourne. No bookings are required.  There is a small ($5) attendance
+      fee.
+    resource_link: 'https://www.adavic.org.au/PG-social-support-support-groups.aspx '
+    resource_mode: Near me
+    resource_name: Anxiety Disorders Association of Victoria (ADAVIC) support group
+  interest:
+  - id: interest
+    location: ~
+    priority: Little interest or pleasure in doing things
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: interest
+    location: ~
+    priority: Little interest or pleasure in doing things
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: interest
+    location: ~
+    priority: Little interest or pleasure in doing things
+    resource_details: Sets simple and effective missions to help you achieve better
+      mental health
+    resource_link: http://moodmission.com/
+    resource_mode: Mobile app
+    resource_name: MoodMission
+  - id: interest
+    location: ~
+    priority: Little interest or pleasure in doing things
+    resource_details: Meet people with similar interests or get inspired to try something
+      new
+    resource_link: https://www.meetup.com/en-AU/find/?allMeetups=true&amp;radius=3&amp;userFreeform=me&amp;mcId=c1000654&amp;change=yes&amp;sort=default
+    resource_mode: Near me
+    resource_name: MeetUp
+  mood:
+  - id: mood
+    location: ~
+    priority: Mood
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: mood
+    location: ~
+    priority: Mood
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: mood
+    location: ~
+    priority: Mood
+    resource_details: Build mental health and wellbeing through mindfulness-based
+      tools
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: mood
+    location: ~
+    priority: Mood
+    resource_details: Provides support for people experiencing symptoms of anxiety
+      or depression. Meetings are held on weeknights in Altona, Camberwell, Coburg,
+      and Cranbourne. No bookings are required.  There is a small ($5) attendance
+      fee.
+    resource_link: https://www.adavic.org.au/PG-social-support-support-groups.aspx
+    resource_mode: Near me
+    resource_name: Anxiety Disorders Association of Victoria (ADAVIC) support group
+  movement:
+  - id: movement
+    location: ~
+    priority: Motor activity / movement
+    resource_details: Provides free online assessment and treatment for people troubled
+      by symptoms of anxiety, depression, and related problems
+    resource_link: https://mindspot.org.au/
+    resource_mode: Online
+    resource_name: MindSpot
+  - id: movement
+    location: ~
+    priority: Motor activity / movement
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: movement
+    location: ~
+    priority: Motor activity / movement
+    resource_details: Tell the app how you're feeling to receive a selection of simple
+      and effective missions that will help boost your activity levels
+    resource_link: http://moodmission.com/
+    resource_mode: Mobile app
+    resource_name: MoodMission
+  - id: movement
+    location: ~
+    priority: Motor activity / movement
+    resource_details: Provides support for people experiencing symptoms of anxiety
+      or depression. Meetings are held on weeknights in Altona, Camberwell, Coburg,
+      and Cranbourne. No bookings are required.  There is a small ($5) attendance
+      fee.
+    resource_link: https://www.adavic.org.au/PG-social-support-support-groups.aspx
+    resource_mode: Near me
+    resource_name: Anxiety Disorders Association of Victoria (ADAVIC) support group
+  sleep:
+  - id: sleep
+    location: ~
+    priority: Sleep
+    resource_details: A six-module program including education, monitoring, practical
+      strategies to improve sleep, and relapse prevention
+    resource_link: https://www.mydigitalhealth.org.au/programs-available/
+    resource_mode: Online
+    resource_name: iSleepWell
+  - id: sleep
+    location: ~
+    priority: Sleep
+    resource_details: Provides free information and advice from a trained mental health
+      professional. Call 1300 22 4636, available 24 hours a day.
+    resource_link: https://www.beyondblue.org.au/
+    resource_mode: Telephone
+    resource_name: beyondblue
+  - id: sleep
+    location: ~
+    priority: Sleep
+    resource_details: 'Mindfulness training with a sleep-specific module as well as
+      others that may assist in improving sleep (e.g., stress) '
+    resource_link: https://smilingmind.com.au/smiling-mind-app/
+    resource_mode: Mobile app
+    resource_name: Smiling mind
+  - id: sleep
+    location: ~
+    priority: Sleep
+    resource_details: Meet other Melbournians struggling with sleep; share experiences
+      and solutions
+    resource_link: https://www.meetup.com/en-AU/SleepMelbourne/
+    resource_mode: Near me
+    resource_name: Sleep Meetup

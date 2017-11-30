@@ -1,0 +1,11 @@
+Subject: Thanks for your interest in Link-me
+
+<h4>Dear [% firstname -%]</h4>
+
+<p>Thanks for your interest in the Link-me trial at your GP clinic. From our records it looks like you're already taking part in the trial. If that's the case, we hope you're finding it useful so far. If you think this is a mistake please contact us at <a href="mailto:link-me@unimelb.edu.au.">link-me@unimelb.edu.au.</a>.</p>
+
+<p>Thank you</p>
+
+<p>The Link-me team</p>
+
+

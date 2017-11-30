@@ -1,0 +1,30 @@
+---
+close: 0
+component_id: c6288b6c-e968-48d6-a429-ec583b83df6e
+frontend_urls:
+  production: https://link-me.study/patient
+  staging: https://university-melbourne.staging.websurvey.net.au/link-me/patient
+  testing: https://university-melbourne.testing.websurvey.net.au/link-me/patient
+  development: http://localhost:5556/patient
+get_session:
+  SessionFrom: CGIParam
+  CreateSession: Never
+progress_meter: 0
+session_parameter: SD_KEY
+style: responsive
+survey_title: Care Navigator Portal
+template_version: '6'
+y2p:
+  Processors:
+  - PageOrder
+  - Percent
+  - UploadForm
+banner:
+  - filename: linkme-surveyheader.png
+    alt: Link Me Logo
+    align: right
+extra_js:
+  - following_questions.js
+  - expandable_tree.js
+  - calculation.js
+  - specify_other.js

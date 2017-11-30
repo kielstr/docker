@@ -1,0 +1,57 @@
+#!/bin/bash
+
+SURVEYS_DIR=/surveys
+
+function push_sessions_file {
+    echo "Pushing sessions file $2 for $1"
+    ws-database -q -c $SURVEYS_DIR/$1/conf/config.pl -s $SURVEYS_DIR/$1/sessions/$2
+}
+
+function rebuild_survey {
+    echo "Rebuilding database for $1"
+    ws-database -q -dD -c $SURVEYS_DIR/$1/conf/config.pl
+}
+
+
+# default
+rebuild_survey default
+push_sessions_file default variables.yaml
+push_sessions_file default test-sessions.yaml
+
+# survey
+rebuild_survey survey
+push_sessions_file survey variables.yaml
+
+# patient
+rebuild_survey patient
+push_sessions_file patient variables.yaml
+
+# follow-up
+rebuild_survey follow-up
+# push_sessions_file follow-up variables.yaml
+
+# action-plan
+rebuild_survey action-plan
+push_sessions_file action-plan variables.yaml
+
+# external-data-consent
+rebuild_survey external-data-consent
+push_sessions_file external-data-consent variables.yaml
+
+# symptom-check
+rebuild_survey symptom-check
+push_sessions_file symptom-check variables.yaml
+
+# appointment-summary
+rebuild_survey appointment-summary
+push_sessions_file appointment-summary variables.yaml
+
+# care-navigator
+rebuild_survey care-navigator
+push_sessions_file care-navigator variables.yaml
+
+rebuild_survey risk-assessment
+push_sessions_file risk-assessment variables.yaml
+
+rebuild_survey consumer-data-submission
+push_sessions_file consumer-data-submission test-sessions.yaml

@@ -1,0 +1,63 @@
+[%# See default/conf/common.pl for the `intervention_areas` functions %]
+[%
+  areas = conf.intervention_areas.keys().sort();
+  FOR area IN areas;
+    IF conf.intervention_areas.$area.ok(session); %]
+      <img src='html/images/icon-[% area %].png' />
+    [% END;
+  END;
+%]
+
+<!--
+[% IF session.get('phq1') == 0 || session.get('phq1') ==  1 %]
+    <img src="html/images/icon-little-interest.png" />
+[% END %]
+
+[% IF session.get('phq2') == 0 || session.get('phq2') == 1 %]
+    <img src="html/images/icon-text-mood.png" />
+[% END %]
+
+[% IF session.get('phq3') == 0 || session.get('phq3') == 1 %]
+    <img src="html/images/icon-text-sleep.png" />
+[% END %]
+
+[% IF session.get('phq4') == 0 || session.get('phq4') == 1 %]
+    <img src="html/images/icon-text-energy.png" />
+[% END %]
+
+[% IF session.get('phq5') == 0 || session.get('phq5') == 1 %]
+    <img src="html/images/icon-text-appetite.png" />
+[% END %]
+
+[% IF session.get('phq6') == 0 || session.get('phq6') == 1 %]
+    <img src="html/images/icon-text-self-image.png" />
+[% END %]
+
+[% IF session.get('phq7') == 0 || session.get('phq7') == 1 %]
+    <img src="html/images/icon-text-concentration.png" />
+[% END %]
+
+[% IF session.get('phq8') == 0 || session.get('phq8') == 1 %]
+    <img src="html/images/icon-text-movement.png" />
+[% END %]
+
+[% IF session.get('gad1') == 0 || session.get('gad1') == 1 %]
+    <img src="html/images/icon-text-anxiety.png" />
+[% END %]
+
+[% IF session.get('gad2') == 0 || session.get('gad2') == 1 %]
+    <img src="html/images/icon-text-worry.png" />
+[% END %]
+
+[% IF session.get('sf1_health') == 1 || session.get('sf1_health') == 2 || session.get('sf1_health') == 3 %]
+    <img src="html/images/icon-text-health.png" />
+[% END %]
+
+[% IF session.get('chronic') == 0 %]
+    <img src="html/images/icon-text-daily-activities.png" />
+[% END %]
+
+[% IF session.get('inc_mg') == 1 || session.get('inc_mg') == 2 || session.get('inc_mg') == 3 %]
+    <img src="html/images/icon-text-economy.png" />
+[% END %]
+-->

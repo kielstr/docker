@@ -1,0 +1,31 @@
+---
+close: 0
+component_id: 84ecb0cb-38e9-4461-bf5f-e0faf275523c
+frontend_urls:
+  production: https://link-me.study/consumer-data-submission
+  staging: https://university-melbourne.staging.websurvey.net.au/link-me/consumer-data-submission
+  testing: https://university-melbourne.testing.websurvey.net.au/link-me/consumer-data-submission
+  development: http://localhost:5556/consumer-data-submission
+get_session:
+  SessionFrom: Login
+  CreateSession: Never
+progress_meter: 0
+session_parameter: SD_KEY
+style: responsive
+survey_title: Consumer data submission
+template_version: '6'
+y2p:
+  Processors:
+  - PageOrder
+  - Percent
+  - UploadForm
+
+banner:
+  - filename: linkme-surveyheader.png
+    alt: Link Me Logo
+    align: right
+extra_js:
+  - following_questions.js
+  - expandable_tree.js
+  - calculation.js
+  - specify_other.js

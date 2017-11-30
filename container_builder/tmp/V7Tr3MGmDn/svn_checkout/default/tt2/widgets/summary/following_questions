@@ -1,0 +1,16 @@
+[% IF q.label %]
+<legend>
+  [% q.label %]
+</legend>
+[% END %]
+
+[% slot_widget( q.qn ) %]
+
+[% IF q.follow_with.defined %]
+  [% FOREACH following_slot = q.follow_with %]
+  [% SET following_slot_val = session.get(following_slot.name).length %]
+    [% IF following_slot.isa('SD::Slot') && following_slot_val != 0 %]
+      [% slot_widget( following_slot ) %]
+    [% END %]
+  [% END %]
+[% END %]

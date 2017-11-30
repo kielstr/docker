@@ -1,0 +1,12 @@
+version: "2"
+
+services:
+  container_builder:
+    image: container_builder
+    build:
+      context: ./
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /Users/kiel/docker/git/tempest/container_builder:/container_builder
+    tmpfs:
+      - /tmp

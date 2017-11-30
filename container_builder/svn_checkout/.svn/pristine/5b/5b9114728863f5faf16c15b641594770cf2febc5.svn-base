@@ -1,0 +1,61 @@
+[%- date = s.inflate(val) %]
+<div class="date [% s.class %]">
+  <input  class="textfield width-2"
+          type="text"
+          size="2"
+          maxlength="2"
+          id="slot.[% nspace %].day"
+          name="slot.[% nspace %].day"
+          value="[% date.day | html %]"
+          placeholder="DD"
+          title="Day"
+          aria-label="Day" />
+  <select name="slot.[% nspace %].month"
+          id="slot.[% nspace %].month"
+          class="select-widget"
+          title="Month"
+          aria-label="Month">
+    <option value=''>-select month-</option>
+    [% FOREACH month IN s.months %]
+      <option value='[% loop.count %]'
+          [% 'selected="selected"' IF ( date.month + 0 ) == loop.count %]>
+          [% month | html %]
+      </option>
+    [% END %]
+  </select>
+  <input  class="textfield width-4"
+          type="text"
+          size="4"
+          maxlength="4"
+          id="slot.[% nspace %].year"
+          name="slot.[% nspace %].year"
+          value="[% date.year | html %]"
+          placeholder="YYYY"
+          title="Year"
+          aria-label="Year"/>
+  <span id="pop-up-[% nspace %]"></span>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+[% IF s.picker != "none" %]
+datePickerController.createDatePicker({
+    formElements:{
+        "slot.[% nspace %].day":"%d",
+        "slot.[% nspace %].month":"%n",
+        "slot.[% nspace %].year":"%Y"
+    },
+    noTodayButton: true,
+    [% IF s.picker == "pop-up" %]
+      // Position the activation button within the span
+      positioned: "pop-up-[% nspace %]",
+    [% ELSIF s.picker == "inline" %]
+      // Inline datepicker
+      staticPos:true,
+      positioned: "pop-up-[% nspace %]",
+      statusFormat:"%l, %d%S %F %Y",
+    [% END %]
+});
+[% END %]
+});
+</script>

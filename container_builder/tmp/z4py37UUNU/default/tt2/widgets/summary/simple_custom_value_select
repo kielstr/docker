@@ -1,0 +1,12 @@
+<span class="select-widget">
+[% val_list = val %]
+[% UNLESS val.length == 0 %]
+  [% val_list = val.list %]
+[% ELSE %]
+  [ Not Required ]
+[% END %]
+
+[% FOREACH val = val_list %]
+  [% val %]
+[% END %]
+</span>

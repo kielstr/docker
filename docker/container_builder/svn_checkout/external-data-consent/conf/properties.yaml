@@ -1,0 +1,29 @@
+---
+close: 0
+component_id: fb5d0bb0-4c9d-4a44-ba66-9007c4e12e74
+frontend_urls:
+  production: https://link-me.study/external-data-consent
+  staging: https://university-melbourne.staging.websurvey.net.au/link-me/external-data-consent
+  testing: https://university-melbourne.testing.websurvey.net.au/link-me/external-data-consent
+get_session:
+  SessionFrom: CGIParam
+  CreateSession: Never
+progress_meter: 0
+session_parameter: SD_KEY
+style: responsive
+survey_title: External Data Consent
+template_version: '6'
+y2p:
+  Processors:
+  - PageOrder
+  - Percent
+  - UploadForm
+banner:
+  - filename: linkme-surveyheader.png
+    alt: Link Me Logo
+    align: right
+extra_js:
+  - following_questions.js
+  - expandable_tree.js
+  - calculation.js
+  - specify_other.js

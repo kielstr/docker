@@ -1,0 +1,382 @@
+/* Your CSS content goes here... */
+
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+
+.header .h1 {
+  padding-top: 50px;
+}
+
+.not-bold legend {
+  font-weight: normal;
+}
+
+.progress-meter .percent-4 {
+  right: 6px;
+}
+
+/* Yes/No widget - Vertical */
+
+.choice_v ul li {
+  float:none;
+}
+
+/* This is to make the parent in navigation align with the default navigation buttons... */
+
+.button_parent {
+  position: absolute;
+  display:inline-block;
+}
+
+#action-parent {
+  margin-top: 0px;
+}
+
+/* This is to make the image in the header align with the text... */
+
+.small-block-grid-1>li:nth-of-type(1n+1) {
+  clear: none;
+}
+
+.header .h1 {
+  padding-top: 30px;
+}
+
+.infobox {
+  width: 60%;
+}
+
+
+/* This is to make the DOB label and form element align */
+body > div > div.content > div.form_element > form > div.row > fieldset > div > div {
+  display: inline-block;
+}
+
+
+@media screen and (min-width:500px) {
+  .date.dobfield {
+    float: left;
+    margin-left: 7.3em;
+  }
+
+  fieldset.question-legend.dobfield > legend {
+    float: left;
+  }
+
+  body > div > div.content > div.form_element > form > div.row > div > fieldset > div > div.date {
+      margin-left: 14.9rem!important;
+  }
+}
+
+.mail-address {
+  float:left;
+  margin-bottom: 5px;
+}
+
+
+fieldset.single-line > div.fieldset-content > ul.choice_h {
+  display: flex;
+}
+fieldset.single-line > div.fieldset-content > ul.choice_h > li {
+  width: 10%;
+}
+
+@media (max-device-width: 500px) and (min-device-width: 250px), only screen and (max-width: 500px) {
+  fieldset.single-line > div.fieldset-content > ul.choice_h {
+    display: block;
+  }
+
+  fieldset.single-line > div.fieldset-content > ul.choice_h > li {
+    width: auto;
+  }
+
+}
+
+/* Custom Fonts */
+
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+
+/* This is for the following question widget */
+.hidden_following {
+  display: none;
+}
+
+.indent_following {
+  padding-left: 22px;
+}
+
+/* this is for specify other widget */
+.text-hidden {
+  display: none;
+}
+.text-show {
+  display: inline-block;
+}
+
+/* this is for the shift log table in log book */
+.shift-log td:first-child {
+  width: 100px;
+}
+
+/* this is to fix the table rendering of inputs on ff/safari */
+
+table.multi_list.add-appointment > tbody > tr > td > select {
+margin:0rem!important;
+}
+
+table.multi_list.add-appointment tbody td:nth-child(2) {
+  width: 280px;
+}
+
+table.multi_list.add-appointment tbody td:nth-child(3) {
+  width: 80px;
+}
+
+table.multi_list.add-appointment tbody td:nth-child(4) {
+  width: 80px;
+}
+
+table.multi_list.add-appointment tbody td:nth-child(5) {
+  width: 80px;
+}
+
+table.multi_list.add-appointment tbody td:nth-child(6) {
+  width: 250px;
+}
+
+table.multi_list.log-book tbody td:nth-child(3) {
+  width: 80px;
+}
+
+table.multi_list.log-book tbody td:nth-child(4) {
+  width: 80px;
+}
+
+table.multi_list.log-book tbody td:nth-child(5) {
+  width: 80px;
+}
+
+
+/* End Fix */
+
+/* Fixes alignment of text fields in log book */
+input#shift.0.log.shift_date.textfield, input#shift.0.log.clinical_work.textfield, input#shift.0.log.trial_work.textfield, input#shift.0.log.other.textfield, input#shift.0.log.other_specify.textfield {
+  margin-right:0.5rem!important;
+  margin-left: 0rem!important;
+}
+
+/* Header Styling to make image fill header */
+
+div.header {
+  margin:0;
+  padding:0;
+}
+
+@media screen and (max-width:500px) {
+  div.header {
+    margin-top:40px;
+  }
+  div.header > ul > li > img {
+    border-radius:0px!important;
+  }
+}
+
+
+li.right {
+  margin-bottom:0;
+    padding-bottom:0;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+div.header > ul, div.header > ul > li.right {
+  padding:0px;
+  margin:0px;
+}
+
+li.right > img.center {
+  margin:0px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.content {
+  border-top:none;
+}
+
+/* Adding background */
+
+.content {
+  background-image:url("images/linkme-background.png");
+  background-repeat: no-repeat;
+  background-color: #2f97cc;
+  background-size: 100%;
+}
+
+/* Makes text in input boxes left aligned in all instances to stop error where x covers up input on iPad */
+
+input[type=number].textfield {
+  text-align: left;
+}
+
+/* Websurvey Maroon Overrides */
+
+h1, h2, h3, h4 {
+  color: #002e6d!important;
+}
+
+.login input[type=submit] {
+  background-color: #002e6d!important;
+}
+
+.choice_h li input[type=checkbox]:checked+label:before, .choice_h li input[type=radio]:checked+label:before, .choice_v li input[type=checkbox]:checked+label:before, .choice_v li input[type=radio]:checked+label:before, .expandable-tree li input[type=checkbox]:checked+label:before, .expandable-tree li input[type=radio]:checked+label:before, .scale li input[type=checkbox]:checked+label:before, .scale li input[type=radio]:checked+label:before {
+  color: #002e6d!important;
+}
+
+[class^=nav-] .button_next input[value=Submit] {
+  background-color: #002e6d!important;
+}
+
+/* Splash Page Highlight Text */
+.splashpage-highlight {
+  color:#ffffff;
+}
+
+/* This group of selectors targets the nav buttons on the consent form page, they need to be visually rearranged */
+@media screen and (min-width:500px) {
+  div#WhocanItalktoaboutthistrial ~ div.nav-first-prev-next > div {
+    display:inline-block;
+    float:none!important;
+  }
+
+  div#WhocanItalktoaboutthistrial ~ div.nav-first-prev-next > div.button_first {
+    float:left!important;
+  }
+
+  div#WhocanItalktoaboutthistrial ~ div.nav-first-prev-next {
+    text-align: right;
+  }
+}
+
+/* This is to fix the alignment of these fields on the care navigator registration page */
+#address, #practice_address {
+  width: 495px;
+}
+
+/* Fixes alignment of datepicker on new appointment form */
+div.date > input, div.date > select, td[data-label="Time"] > input, td[data-label="Care Navigator"] > input {
+  margin: 0rem!important;
+}
+
+.multi_list tbody th {
+  width: 14%!important;
+}
+
+
+.infobox .consent {
+  width: 90%;
+}
+
+
+.bordered_table tfoot tr {
+  border-bottom: 2px solid #ccc;
+  background-color: #fdfdfd;
+}
+
+.ws-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border-radius: 0;
+  cursor: pointer;
+  font-family: Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;
+  font-weight: 400;
+  line-height: normal;
+  margin: 0 0 1.25rem;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  padding: .625rem 1.25rem .6875rem;
+  font-size: .6875rem;
+  background-color: #ececec;
+  border: 0 solid #bdbdbd;
+  color: #333;
+  border-radius: 10px;
+  transition: background-color .3s ease-out;
+  margin: 0;
+  font-family: Roboto,Arial,Helvetica Neue,Helvetica,sans-serif;
+  font-size: 1em;
+}
+
+/* Label alignment fix for external consent form page */
+label[for="slot.authorise_services.1"], label[for="slot.authorise_services.2"] {
+  display: inline-flex!important;
+}
+
+/* Make buttons more noticeable on 'get started with link me' page */
+.whitehighlight > div > ul > li {
+  margin-left: 4px;
+  border-radius: 5px;
+  padding: 10px;
+  background: white;
+}
+
+/* Make the font a bit bigger */
+
+body {
+  font-size:1rem!important;
+}
+
+/* Fix phone field mobile */
+@media (max-device-width: 500px) and (min-device-width: 250px), only screen and (max-width: 500px) {
+ input#phone[type=email].textfield, input[type=number].textfield {
+    width:100%;
+  }
+}
+
+/* Fixes footer rendering at mobile res */
+@media (max-device-width: 500px) and (min-device-width: 250px), only screen and (max-width: 500px){
+  .footer {
+      position: absolute;
+      bottom: 0px;
+      right: 0;
+      width: 100%;
+      background: white;
+  }
+}
+
+@media screen and (max-width:500px) {
+  .wrapper {
+    background-color: #3097cc;
+  }
+}
+
+/* Print Styling */
+@media print {
+  div.content {
+    background-image: none;
+    background-color: #FFFFFF;
+  }
+  .infobox-print {
+    display: block;
+  }
+  .header {
+    display: block !important;
+  }
+}
+
+.infobox.consent {
+  width: 90%;
+}
+
+span.has-tip {
+  display: none;
+}

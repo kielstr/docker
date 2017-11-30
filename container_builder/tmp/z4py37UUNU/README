@@ -1,0 +1,89 @@
+# Running a local version
+
+Note: If you need the admin site to be working locally, update default/conf/common.pl where it says 'mash.fz.sdlocal.net' to the name of your computer instead. For examples, Gigi's mac is called 'bumblbee', so update the url to 'http://bumblebee.fz.sdlocal.net:5009' in common.pl
+
+* Ensure survey directory is up to date
+* Run the command ./run-test-version.sh
+* This will populate the survey with test-sessions.yaml from default and all variables.yaml files for the rest of the components
+* View survey at http://localhost:5556/ and the admin site at http://localhost:5557/
+* When finished, run docker-compose down to stop it
+
+# Updating DOCKER Production
+
+* Instead of using the production instance on tempest, we use a different environment called DOCKER Production for this survey. To update the DOCKER Production, follow the steps below.
+
+1. Ensure survey directory in your svn (versions) is up to date
+
+2. Go to the survey directory: cd /Users/gigip/Documents/development/university-melbourne/link-me
+
+2. Run `./release.sh` script in your terminal (this will backup the current production image before pushing a new one)
+
+3. Ask a sysadmin to update link-me, tell them you've already pushed a new image
+
+* Note that to apply new sessions yaml file to the DOCKER Production, you will need Ash or Russell to do that for you
+
+# Add Care Navigators
+
+* Care Navigators can be added via the admin site. We have a template for adding new Care Navigators or RTCs. Because it contains passwords that could potentially let naughty people into highly sensitive data it is stored on Owncloud under the WebSurvey log-in.
+    
+1. Download the template
+
+2. Edit the template
+
+3. Load the template here: https://link-me-admin.websurvey.net.au/unimelb/link_me/add-care-navigator
+   BE CAREFUL: It will override what is already there!
+4. Load the modified template back into Owncloud
+
+5. Delete any copy of the template from your computer - eg, from the downloads list & your trash 
+
+
+# Add PHNs + Clinics +GPs
+
+* PHNs, Clinics and GPs can be added via tempest
+
+1. Edit or add new PHNs, Clinics and GPs in this file university-melbourne/link-me/default/script/gps.csv
+   Note: this is a master file, you can edit anything but do not remove any existing reocrds
+
+2. Run default/script/generate-gp-list.pl in terminal
+   - open terminal
+   - go to the survey directory: cd /Users/gigip/Documents/development/university-melbourne/link-me/default/scripts 
+	 - enter this line: perl generate-gp-list.pl gps.csv
+	 - this will create a file called gps.yaml
+
+3. In university-melbourne/link-me/survey/conf, rename the exisiting gps.yaml as gps-DATE.yaml. Then copy the new gps.yaml and paste it in here
+
+4. Commit file to tempest and reload survey
+
+5. Check that it works on testing, then release the change to the DOCKER Production (follow the steps in "Updating Production")
+
+
+# Add Resources
+
+1. Edit or add new in this file university-melbourne/link-me/default/script/resources.xlsx. Make sure the name of the tab is the correct PHN name
+   Note: this is a master file. However, because this file is only for display purpose (no data involved), you can remove any rows if you need to
+
+2. Run default/script/resources-xls-to-csv.pl in terminal
+   - open terminal
+   - go to the survey directory: cd /Users/gigip/Documents/development/university-melbourne/link-me/default/scripts 
+	 - enter this line: perl resources-xls-to-csv.pl resources.xlsx
+	 - this will create multiple csv files in this folder default/script/PHN_Resources. Open them and make sure they look sensible
+
+3. Run default/script/generate-resources.p in terminal
+	 - enter this line: perl resources-xls-to-csv.pl
+	 - this will create a file called resources.yaml
+	
+4. In university-melbourne/link-me/survey/conf, rename the exisiting resources.yaml as resources-DATE.yaml. Then copy the new resources.yaml and paste it in here
+
+5. Commit file to tempest and reload survey
+
+6. Check that it works on testing, then release the change to the DOCKER Production (follow the steps in "Updating Production")
+
+
+# Add survey logins
+
+* You will need multiple logins for each practice. Follow the format file format in university-melbourne/link-me/default/admin/sessions.csv and follow breeze instructions to create new logins: https://gh.sdintra.net/WebSurvey/breeze/wiki/Recipe%3A-Add-New-Users-To-A-Survey
+
+* Note that to apply new sessions yaml file to the DOCKER Production, you will need Ash or Russell to do that for you
+
+
+

@@ -1,0 +1,21 @@
+[%- IF !q.exists('has_show') || q.qn.show(session) %]
+    [% IF q.label %]
+    <legend>
+    [% q.label %]
+    </legend>
+    [% END %]
+
+    [% slot_widget( q.qn ) %]
+
+    [% IF q.follow_with.defined %]
+    <div class="hidden_following indent_following" id="[% q.qn.name %]_following">
+        [% FOREACH following_slot = q.follow_with %]
+            [% IF following_slot.isa('SD::Slot')  %]
+                [% slot_widget( following_slot ) %]
+            [% ELSE %]
+                [% following_slot.qn %]
+            [% END %]
+        [% END %]
+    </div>
+    [% END %]
+[% END -%]

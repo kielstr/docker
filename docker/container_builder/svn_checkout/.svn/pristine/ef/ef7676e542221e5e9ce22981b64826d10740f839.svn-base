@@ -1,0 +1,34 @@
+---
+close: 0
+component_id: a7435b4e-6a74-4348-8d40-6a2d08501e46
+frontend_urls:
+  production: https://link-me.study/follow-up
+  staging: https://university-melbourne.staging.websurvey.net.au/link-me/follow-up
+  testing: https://university-melbourne.testing.websurvey.net.au/link-me/follow-up
+  development: http://localhost:5556/follow-up
+get_session:
+  SessionFrom: Login
+progress_meter: 0
+session_parameter: SD_KEY
+style: responsive
+survey_title: Link-me Follow Up Survey
+template_version: '6'
+y2p:
+  Processors:
+  - PageOrder
+  - Percent
+  - UploadForm
+
+banner:
+  - text:
+      - Link-me Follow Up Survey
+    align: left
+  - filename: Unimelb-Logo.jpg
+    alt: University of Melbourne Logo
+    align: right
+extra_js:
+  - following_questions.js
+  - expandable_tree.js
+  - calculation.js
+  - specify_other.js
+

@@ -1,0 +1,11 @@
+<h2>Thank you for taking part in Link-me</h2>
+
+[%-
+    SET default_conf = conf.get_component_config('default');
+    SET default_url  = default_conf.webserver_info().fe_url;
+    SET session_key = session.get('parent_session');
+-%]
+
+<form action="[% default_url %]/q?SD_KEY=[% session_key %]">
+    <input type="submit" value="Clinic use only" />
+</form>

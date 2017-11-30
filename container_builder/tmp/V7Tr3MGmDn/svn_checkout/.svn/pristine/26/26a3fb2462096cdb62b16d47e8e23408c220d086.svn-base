@@ -1,0 +1,40 @@
+[%
+    multi = s.isa("SD::Slot::Multi") ? 'multiple' : '';
+    size = "size='$s.size'" IF s.size;
+%]
+
+<select [% multi %] name="slot.[% nspace %]" [% size %]
+    [%
+        SET cmd = "clear_field(\"skip.${s.name}\");" IF e.isa('E::Skip::Warn');
+        IF s.autosubmit; # side effect misparsed
+            cmd = cmd _ 'document.forms[0]["action.next"].click();';
+        END;
+        "onChange='$cmd'" IF cmd;
+    -%] >
+[% SET option_keys = s.option_keys;
+   FOREACH v = val.list ;
+     checked.$v = 1;
+     SET other_val = v UNLESS option_keys.exists(v); # one only
+   END %]
+[% UNLESS multi %]
+  <option value=''>-choose one-</option>
+[% END %]
+[% FOREACH opt = s.options %]
+  [% SET value = opt.list.defined(0) ? opt.0 : loop.count %]
+  [% SET text  = ( opt.list.defined(1) ? opt.1 : opt ) | html %]
+  <option value="[% value %]" [% 'selected="selected"' IF checked.item(value) %]>
+    [% text %]
+  </option>
+[% END %]
+
+</select>
+<br/>
+[% IF s.open %]
+[% s.other || "Other" # prompt %] <br/>
+[% size = s.other_size || 30 %]
+<input type=text name="slot.[% nspace %]" value="[% other_val | html %]"
+    size="[% size %]" maxlength="[% size %]"
+[% "onKeyDown='clear_field(\"skip.${s.name}\");'" IF e.isa('E::Skip::Warn') %]
+[% "onFocus='clear_field(\"slot.${s.name}\",\"select-one\");'" UNLESS multi %]
+    >
+[% END %]

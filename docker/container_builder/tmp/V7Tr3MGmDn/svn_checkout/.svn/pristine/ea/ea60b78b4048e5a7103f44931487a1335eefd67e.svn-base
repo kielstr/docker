@@ -1,0 +1,105 @@
+version: "2"
+
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: linkme
+      MYSQL_USER: link-me
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: more-secure-password
+  ws:
+    build: .
+    command: /docker/composed-start.sh
+    image: docker.sdlocal.net/websurvey/link-me:latest
+    links:
+      - mysql
+    environment:
+      SD_DB_URI: mysql://link-me:password@mysql/linkme
+      SD_DB_UPDATE_URI: mysql://root:more-secure-password@mysql/linkme
+      SD_DEPLOYMENT: development
+      SD_UNIVERSE: build
+      SD_GENERATION: current
+      SD_LOCATION: fitzroy
+
+      # For Development
+      WS_HTTP_COOKIE: 1
+
+      # WS_DEPLOYMENT: development
+      WS_DOMAIN_NAME: http://mash.fz.sdlocal.net:5555
+      WS_SUPPORT_EMAIL_ADDRESS: support@websurvey.com.au
+
+      # Will need MAILGUN domain/apikey for websurvey
+      SD_PLATFORM_MAILGUN_DOMAIN: sandboxf9995bfb16d04b2f9f75dfc0e2f17e2c.mailgun.org
+      SD_PLATFORM_MAILGUN_APIKEY: automated-testing-not-a-real-key
+  postgres:
+    image: docker.sdlocal.net/fixture/postgres:9.5
+    environment:
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: ws-admin
+  ws-admin:
+    image: docker.sdlocal.net/websurvey/admin:development
+    #command: /ws-admin/docker/start-dev-backend.sh plackup -s Gazelle -p 80 app.psgi
+    command: /ws-admin/docker/run.sh
+    ports:
+      - 5557:80
+    links:
+      - postgres
+      - mysql
+    volumes_from:
+      - postgres
+    environment:
+      WSADMIN_DB_URI: db:pg://postgres:password@postgres/ws-admin
+      WSADMIN_WEBSURVEY_DB_URI: db:mysql://link-me:password@mysql/linkme
+      # XXX: Use local s3 here
+      WSADMIN_S3_ACCESS_KEY: WJZ0LSTGVAIWAJRQWZZ_
+      WSADMIN_S3_SECRET_KEY: mu6IedQ0ZryC05IB7-GjM6Di1160IJo0-ybR-w==
+      WSADMIN_S3_BUCKET_NAME: uploads
+
+      EMAIL_SENDER_TRANSPORT: SMTP
+      EMAIL_SENDER_TRANSPORT_host: maildev
+      EMAIL_SENDER_TRANSPORT_port: 25
+
+      # For development
+      WSADMIN_HTTP_COOKIE: 1
+
+      SD_DEPLOYMENT: development
+      SD_LOCATION: fitzroy
+      # XXX: Get local ldap
+      SD_LDAP_SERVERS: ldap-master.fz.sdlocal.net
+  proxy:
+    image: nginx:alpine
+    ports:
+      - 5556:80
+    volumes:
+      - $PWD/default/docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    links:
+      - ws
+
+  ###
+  # Testing
+  ###
+  selenium:
+    # image: docker.sdlocal.net/fixture/selenium
+    # Alternate image with RemoteDesktop (VNC) support - uncomment the :5900 port mapping too
+    image: selenium/standalone-chrome-debug
+    ports:
+      - "7900:5900"
+    environment:
+      TARGET_APP_CONTAINER_PORT: 7000
+      DBUS_SESSION_BUS_ADDRESS: 'disabled:'
+
+  python_selenium:
+    build:
+      context: ./selenium/
+      dockerfile: python_selenium.dockerfile
+    image: docker.sdlocal.net/websurvey/admin:latest
+    container_name: python_selenium1
+    links:
+      - selenium
+    volumes_from:
+      - selenium
+    volumes:
+      - ./selenium/test-upload-files/:/shared/test-upload-files:ro
+      - ./selenium/test-results:/shared/test-results
+      - ./selenium:/shared:ro

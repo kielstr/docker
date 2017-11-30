@@ -1,0 +1,38 @@
+[%
+    multi = s.isa("SD::Slot::Multi") ? 'multiple' : '';
+    size = "size='$s.size'" IF s.size;
+
+    phn      = session.get('phn');
+    practice = session.get('practice');
+    gps      = conf.gps.$phn.$practice || [];
+
+    default_options = [s.other_text, "I'm not sure"];
+
+    options = gps.merge(default_options);
+%]
+
+<select [% multi %] name="slot.[% nspace %]" [% size %]
+        class="select-widget[% IF q.class; ' ' _ q.class; END; %]"
+>
+[% SET option_keys = options;
+   FOREACH v = val.list ;
+     checked.$v = 1;
+     SET other_val = v UNLESS option_keys.exists(v); # one only
+   END %]
+
+[% IF !multi && options.size > 1 %]
+  <option value=''>-choose one-</option>
+[% END %]
+
+[% IF options.size == 0 %]
+  <option value='' disabled selected>No Doctors Available</option>
+[% END %]
+
+[% FOREACH opt = options %]
+  <option value="[% opt %]" [% 'selected="selected"' IF checked.item(opt) %]>
+    [% opt %]
+  </option>
+[% END %]
+
+</select>
+<br/>

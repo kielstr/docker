@@ -1,0 +1,4 @@
+<a href="glossary.tt2#dfn_[% term %]" id="start_[% term.remove('( |\?|/|\|_|[()])')  %]" class="info-btn" target="_blank">
+  [% text || term %]
+  <span class="sr-only">opens dialog</span>
+</a>

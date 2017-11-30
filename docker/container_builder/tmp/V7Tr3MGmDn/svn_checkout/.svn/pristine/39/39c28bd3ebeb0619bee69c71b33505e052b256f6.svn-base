@@ -1,0 +1,45 @@
+---
+- username
+- password
+- patient_id_prefix
+- next_patient_id
+- phn
+- practice
+- session_key
+- location
+---
+- password: ut=3R6vg
+  username: t1
+- password: 6w$$MCaB
+  username: t2
+- password: qV3@hL74
+  username: t3
+- password: uE5RWu%?
+  username: t4
+---
+- patient_id_prefix: BN
+  next_patient_id: 1
+  username: t1
+  phn: Brisbane North
+  practice: Brisbane Practice
+  session_key: c7fde13a-c02a-4217-87da-d162561cab37
+- patient_id_prefix: NW
+  next_patient_id: 1
+  username: t2
+  phn: North Western Melbourne
+  practice: High Street Medical and Dental Centre Preston
+  session_key: 46de9086-f3f6-4cff-a051-8154281f37ad
+- patient_id_prefix: NCCOFFS
+  next_patient_id: 1
+  username: t3
+  phn: North Coast
+  practice: Coffs Harbour
+  location: Coffs Harbour
+  session_key: e5aba832-c5ea-48f9-b63b-73bc65b78eb6
+- patient_id_prefix: NCPORT
+  next_patient_id: 1
+  username: t4
+  phn: North Coast
+  practice: Greenmeadows Medical
+  location: Port Macquarie
+  session_key: a670997f-8291-4d5b-8a16-fe099e6afb23

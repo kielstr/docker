@@ -1,0 +1,28 @@
+[%- # Setup..
+
+num_opts = s.options.size
+type = (s.isa("SD::Slot::Multi") || num_opts == 1) ? 'checkbox' : 'radio';
+FOREACH v = val.list ;
+  checked.$v = 1;
+END
+-%]
+
+[% IF s.difficult_areas %]
+  [% diff_areas = conf.get_difficult_areas(session) %]
+  [% display_options = {} %]
+  [% FOR area IN diff_areas %]
+    [% display_options.$area = 1 %]
+  [% END %]
+[% END %]
+<span class="choice-summary choice_v">
+  [%- FOREACH opt = s.options %]
+    [% opt_val = (opt.keys.size ? opt.keys.first : loop.count ) %]
+    [% NEXT UNLESS checked.$opt_val %]
+    [% IF s.difficult_areas && !display_options.$opt_val %]
+      [% NEXT %]
+    [% END %]
+
+    [% opt_text = (opt.values.size ? opt.values.first : opt ); %]
+    [% opt_text %]
+  [%- END %]
+</span>

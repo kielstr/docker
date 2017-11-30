@@ -1,0 +1,91 @@
+[%# Defining variables for the title %]
+[%
+  page_heading = page.qns.0.heading;
+  page_title   = page_heading.replace('(<.*?>|/)',' ') | collapse;
+  survey_title = conf.survey_title;
+  FOREACH item IN conf.banner;
+    IF item.text && !text;
+      title_text = ref(item.text) == 'ARRAY' ? item.text.0 : item.text;
+    END;
+    IF item.alt && !alt;
+      title_alt = item.alt;
+    END;
+  END;
+%]
+
+<!DOCTYPE html>
+<html class="no-js [% html_class %]" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>
+      [% IF page_heading %]
+        [% page_title %] -
+      [% END %]
+      [% IF title_text %]
+        [% title_text %]
+      [% ELSIF survey_title != "Survey" %]
+        [% survey_title %]
+      [% ELSIF title_alt %]
+        [% title_alt %]
+      [% END %]
+    </title>
+    <meta name="description" content="[% survey_title %] - [% title_text %] - Powered by Web Survey">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="static/css/ws.min.css">
+    [% FOR css_src IN conf.extra_css %]
+      <link rel="stylesheet" href="html/css/[% css_src %]">
+    [% END %]
+    <link rel="stylesheet" href="html/local.css">
+
+    <!-- Favicon link -->
+    <link rel="apple-touch-icon" sizes="57x57" href="static/images/favicons/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="static/images/favicons/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="static/images/favicons/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="static/images/favicons/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="static/images/favicons/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="static/images/favicons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="static/images/favicons/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="static/images/favicons/apple-touch-icon-180x180.png">
+    <link rel="icon" href="static/images/favicons/safari-pinned-tab.svg">
+    <link rel="icon" type="image/png" href="static/images/favicons/favicon-194x194.png" sizes="194x194">
+    <link rel="icon" type="image/png" href="static/images/favicons/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="static/images/favicons/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="static/images/favicons/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/x-icon" href="static/images/favicons/favicon.ico" sizes="16x16">
+    <link rel="icon" type="image/png" href="static/images/favicons/favicon-32x32.png" sizes="32x32">
+    <link rel="manifest" href="static/images/favicons/manifest.json">
+    <meta name="theme-color" content="#98002e">
+    <meta name="msapplication-TileColor" content="#98002e">
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <script src="static/js/ws-lib.min.js"></script>
+    <script src="static/js/ws-app.min.js"></script>
+    [% FOR js_src IN conf.extra_js %]
+      <script src="html/js/[% js_src %]"></script>
+    [% END %]
+    [%+ head_extra %]
+  </head>
+  <body>
+    <div class="wrapper">
+      [%- PROCESS top_banner %]
+      <div class="content">
+        <div class="no-js js-infobox">
+          <noscript>We've detected that your browser does not support JavaScript. As a result, some functionality may be lost. If possible, please change to a browser that supports javascript.</noscript>
+        </div>
+        <div class="browsehappy infobox">
+          <p>You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        </div>
+        [%- error WRAPPER error_msg # tt2 %]
+        [%- err WRAPPER error_msg # me %]
+        [%- content -%]
+      [%- PROCESS debug IF conf.allow_debug && args.debug -%]
+      </div>
+      <div class="footer">
+        <a target="_blank" href="http://www.websurvey.com.au/">
+          <img src="static/images/websurvey_small.gif" alt="Powered by WebSurvey (opens new window)" title="Opens the WebSurvey website in a new window"/>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+---
+- session_key
+- username
+- phn
+- location
+- practice
+- patient_id_prefix
+- next_patient_id
+- email
+---
+- password: nc$$_4MQ
+  username: greenmeadows-1001
+---
+- email: ''
+  location: Port Macquarie
+  next_patient_id: '1'
+  patient_id_prefix: NCPORT
+  phn: North Coast
+  practice: Greenmeadows Medical
+  session_key: 3d279018-ac24-492e-96c5-a7a788d0c799
+  username: greenmeadows-1001

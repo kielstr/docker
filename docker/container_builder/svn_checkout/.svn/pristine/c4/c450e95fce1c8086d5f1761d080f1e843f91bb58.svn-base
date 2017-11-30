@@ -1,0 +1,42 @@
+[%- # Setup..
+
+num_opts = s.options.size
+type = (s.isa("SD::Slot::Multi") || num_opts == 1) ? 'checkbox' : 'radio';
+FOREACH v = val.list ;
+  checked.$v = 1;
+END
+-%]
+
+[% IF s.difficult_areas %]
+  [% diff_areas = conf.get_difficult_areas(session) %]
+  [% display_options = {} %]
+  [% FOR area IN diff_areas %]
+    [% display_options.$area = 1 %]
+  [% END %]
+[% END %]
+<ul class="choice_v">
+  [%- FOREACH opt = s.options %]
+    [% opt_val = (opt.keys.size ? opt.keys.first : loop.count ) %]
+    [% IF s.difficult_areas && !display_options.$opt_val %]
+      [% NEXT %]
+    [% END %]
+  <li>
+    <input type="[% type %]" name="slot.[% nspace %]" id="slot.[% nspace %].[% loop.count %]"
+        value="[% opt_val %]" [% 'checked="checked"' IF checked.item(opt_val) %]
+        [%-
+          SET cmd = "clear_field(\"skip.${s.name}\");" IF e.isa('E::Skip::Warn');
+          IF s.autosubmit; # side effect misparsed
+            cmd = cmd _ 'document.forms[0]["action.next"].click();';
+          END;
+          "onClick='$cmd'" IF cmd;
+        -%] />
+
+    <label for="slot.[% nspace %].[% loop.count %]">
+      [%
+        opt_text = (opt.values.size ? opt.values.first : opt );
+        INCLUDE qn q=opt_text;
+      %]
+    </label>
+  </li>
+  [%- END %]
+</ul>

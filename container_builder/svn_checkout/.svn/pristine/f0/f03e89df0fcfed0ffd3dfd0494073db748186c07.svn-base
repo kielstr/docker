@@ -1,0 +1,29 @@
+[% html_class          = "summary" %]
+[% conf.banner_heading = 'Summary View' %]
+
+[%
+
+  page_name           = args.page_name;
+  patient_session_key = args.SD_KEY;
+  patient_session     = conf.fetch_session(patient_session_key, 'patient');
+  survey_session      = conf.fetch_session(patient_session.get('survey_session_key'), 'survey');
+
+  patient_config = conf.get_component_config('patient');
+  page_object    = patient_config.pages.$page_name;
+
+%]
+
+<h1 class="hide_on_print">Summary View</h1>
+<div class="infobox infobox-print">
+  Patient name: [% survey_session.get('firstname') %] [% survey_session.get('surname') %]<br/>
+  Date of birth: [% survey_session.get('dob') || 'N/A' %]<br/>
+  Phone: [% survey_session.get('phone') || 'N/A' %]<br/>
+  Email: [% survey_session.get('email') || 'N/A' %]<br/>
+  Address: [% survey_session.get('address') || 'N/A' %]<br/>
+</div>
+
+<input class="hide_on_print" type="button" value="Print" onClick="window.print()">
+
+[%
+  INCLUDE 'summary_page.tt2' summary_view=1 widget_set='summary' session=patient_session page=page_object;
+%]

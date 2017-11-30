@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<testsuite errors="0" failures="0" name="test.TestCase0-20170928045656" tests="1" time="59.059">
+	<testcase classname="test.TestCase0" name="testCase" time="59.059"/>
+	<system-out>
+<![CDATA[MOTIVATION
+]]>	</system-out>
+	<system-err>
+<![CDATA[]]>	</system-err>
+</testsuite>

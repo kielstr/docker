@@ -1,0 +1,26 @@
+[%
+  difficult_areas    = session.get('q2');
+  intervention_areas = conf.intervention_areas;
+
+  IF !difficult_areas || difficult_areas.size == 0;
+    difficult_areas = [];
+    areas = conf.intervention_areas.keys().sort();
+    FOR area IN areas;
+      IF conf.intervention_areas.$area.difficult(session);
+        difficult_areas.push(area);
+      END;
+    END;
+  END;
+
+  first_area  = intervention_areas.${ difficult_areas.first }.sentence_text;
+  second_area = intervention_areas.${ difficult_areas.last }.sentence_text;
+
+%]
+
+[% IF difficult_areas && difficult_areas.size == 2 %]
+  <p>In Link-me, we're interested in supporting you to make some changes to help with your <strong>[% first_area %]</strong> and <strong>[% second_area %]</strong>. A good trick to help you get and stay motivated to make these changes is to ask yourself: What would be different for you if these things improved?</p>
+[% ELSIF difficult_areas && difficult_areas.size == 1 %]
+  <p>In Link-me, we're interested in supporting you to make some changes to help with your <strong>[% first_area %]</strong>. A good trick to help you get and stay motivated to make these changes is to ask yourself: What would be different for you if these things improved?</p>
+[% ELSE %]
+  <p>In Link-me, we're interested in supporting you to make some changes to help with your mental health. A good trick to help you get and stay motivated to make these changes is to ask yourself: What would be different for you if your mental health improved?</p>
+[% END %]

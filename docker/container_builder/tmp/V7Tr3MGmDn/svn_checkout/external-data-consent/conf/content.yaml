@@ -1,0 +1,553 @@
+# Prototypes
+c_v:
+  type: choice
+  widget: choice_v
+
+c_h:
+  type: choice
+  widget: choice_h
+
+mc_v:
+  type: multichoice
+  widget: choice_v
+
+mc_h:
+  type: multichoice
+  widget: choice_h
+
+# db_upload - upload slot that stores data in our database
+db_upload:
+  type: upload
+  store_class: 'SD::Slot::Upload::Store::Database'
+
+# datepicker - date slot with jQuery datepicker
+datepicker:
+  type: date
+  widget: datepicker
+  class: datepicker
+
+#
+# Often used
+#
+
+
+
+
+
+custom_value:
+  type: c_v
+  widget: custom_value_select
+  option_keys: |
+    sub {
+      my $self = shift;
+      # XXX: Use a preprocessor to pre-calculate and store this result
+      my $ctr = 0;
+      return { map { $_->[0] => $ctr++ } @{ $self->options } }
+    }
+  check: |
+    sub {
+      my ( $self, $item ) = @_;
+      return 1 if ( $self->open );
+      # $item must be a valid key to the option_keys hash
+      my $keys = $self->option_keys;
+      die E->new("Not one of the allowed responses") unless exists $keys->{$item};
+      return 1;
+    }
+  pretty_value: |
+    sub {
+      my ( $self, $val ) = @_;
+      my $keys = $self->option_keys;
+      return $self->options->[ $keys->{$val} ]->[1];
+    }
+
+y_n:
+  type: choice
+  options:
+    - 1: 'Yes'
+    - 0: 'No'
+  widget: choice_h_altvals
+  class: ynd
+  check: |
+    sub {
+      my ($self, $val) = @_;
+      # options is: [ { 0 => 'No' }, { 1 => 'Yes' } ]
+      my %opts = map { %$_ } @{ $self->options };
+      #  %opts: { 0 => 'No', 1 => 'Yes' }
+      unless ($opts{$val}) { # assume "true" labels
+          die E->new("Not one of allowed responses");
+      }
+      return 1;
+    }
+  perdy_value: |
+    sub {
+      my ($self, $val) = @_;
+      return "" if ! defined $val; # empty string if not defined
+      my %opts = map { %$_ } @{ $self->options };
+      return $opts{$val} || $val;
+    }
+
+y_n_v:
+  type: choice
+  mandatory: 1
+  options:
+    - 1: 'Yes'
+    - 0: 'No'
+  widget: choice_v_altvals
+  class: ynd
+  check: |
+    sub {
+      my ($self, $val) = @_;
+      # options is: [ { 0 => 'No' }, { 1 => 'Yes' } ]
+      my %opts = map { %$_ } @{ $self->options };
+      #  %opts: { 0 => 'No', 1 => 'Yes' }
+      unless ($opts{$val}) { # assume "true" labels
+          die E->new("Not one of allowed responses");
+      }
+      return 1;
+    }
+  perdy_value: |
+    sub {
+      my ($self, $val) = @_;
+      return "" if ! defined $val; # empty string if not defined
+      my %opts = map { %$_ } @{ $self->options };
+      return $opts{$val} || $val;
+    }
+
+
+
+
+
+# yes_no - choice with yes or no
+yes_no:
+  type: choice
+  widget: choice_v
+  options:
+    - Yes
+    - No
+
+yes_no_h:
+  type: choice
+  widget: choice_h
+  options:
+    - Yes
+    - No
+
+
+
+#
+# Stubs for larger widgets
+#
+
+# tree - org_tree_expand select type with sane check and options subs
+tree:
+  type: choice
+  widget: org_tree_expand
+  check: |
+    sub {
+       my ($self, $item) = @_;
+       unless($item =~ /^\d+$/ && $item >= 1 && $item <= scalar @{ $self->options } ){
+           die E->new("Not one of allowed responses");
+       }
+       return 1;
+    }
+  options: |
+    sub {
+      my $self = shift;
+      use Data::Rmap qw/:all/;
+      return [ rmap_to {
+        return cut( $_->{text} ) if (ref $_ eq 'HASH');
+        return $_ unless ref $_;
+        return shift->recurse;
+      } HASH|ARRAY|VALUE, @{$self->tree} ];
+    }
+
+
+# ranking - a record slot that handles 'rank the following' type questions
+ranking:
+  type: record
+  mandatory: |
+    sub {
+      my $self = shift;
+      return 1 unless defined $_[0];
+      return ! $self->normalize(@_);
+    }
+  # XXX: normalize is depreciated, but.. currently there is no simple
+  # way to override the check sub to run code after the subslot validation
+  normalize: |
+    sub {
+      my( $self, $val ) = @_;
+      my %val_counts;
+      for my $slt ( @{ $self->columns } ) {
+        next if ! exists $val->{ $slt->name }; # Should this be var_name
+        my $v = $val->{ $slt->name };
+        next if (! defined $v || $v =~ /^\s*$/);
+        if ( $val_counts{$v}++ ) {
+          die E->new("More than one criterion has the same ranking ($v)");
+        }
+      }
+      unless ( scalar keys %val_counts == $self->columns->[0]->max_val ) {
+        die E::Skip->new("You must rank the criterion from ".
+          $self->columns->[0]->min_val." to ".$self->columns->[0]->max_val );
+      }
+      return 1;
+    }
+
+
+# You can add more here
+
+
+phq_scale:
+  type: choice
+  mandatory: 1
+  options:
+    - 0: 'Not at all'
+    - 1: 'Several days'
+    - 2: 'More than half the days'
+    - 3: 'Nearly every day'
+  widget: choice_h_altvals
+  class: ynd
+  check: |
+    sub {
+      my ($self, $val) = @_;
+      # options is: [ { 0 => 'Not at all' }, { 1 => 'Several days' }, { 2 => 'More than half the days' }, { 3 => 'Nearly every day' } ]
+      my %opts = map { %$_ } @{ $self->options };
+      #  %opts: { 0 => 'Not at all', 1 => 'Several days'', 2 => 'More than half the days', 3 => 'Nearly every day' }
+      unless ($opts{$val}) { # assume "true" labels
+          die E->new("Not one of allowed responses");
+      }
+      return 1;
+    }
+  perdy_value: |
+    sub {
+      my ($self, $val) = @_;
+      return "" if ! defined $val; # empty string if not defined
+      my %opts = map { %$_ } @{ $self->options };
+      return $opts{$val} || $val;
+    }
+
+k10_scale:
+  type: choice
+  widget: choice_v
+  options:
+    - None of the time
+    - A little of the time
+    - Some of the time
+    - Most of the time
+    - All of the time
+
+scale_10_important:
+  type: choice
+  widget: choice_h
+  mandatory: 1
+  options:
+    - '1 Not at all important'
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - '10 Totally important'
+
+scale_10_confident:
+  type: choice
+  widget: choice_h
+  mandatory: 1
+  options:
+    - '1 Not at all confident'
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - '10 Totally confident'
+
+email_check:
+  type: text
+  input_type: email
+  widget: textfield
+  mandatory: 1
+  size: 80
+  check: |
+    sub {
+      my $self = shift;
+
+      if ($self->exists(@_)) {
+        die E->new("Email already exists");
+      }
+      # Normalize
+      my $email = Email::Valid->address( -address => lc $_[0], -mxcheck => 1 );
+      if ( ! $email ) {
+        die E->new( "You must supply a valid email address (not $_[0])" );
+      }
+      $_[0] = $email;
+      return !! $email;
+    }
+
+phone_check:
+  type: int
+  class: consent
+  mandatory: 1
+  min_val: 0
+  max_val: 9999999999
+#  mandatory: 1
+  check: |
+    sub {
+      my $self = shift;
+      $self->super(@_);
+
+      if ($self->exists(@_)) {
+        die E->new("Phone number already exists");
+      }
+
+      my $val = shift;
+
+      my $area_code = substr($val, 0, 2);
+      # Converting international prefix of 61 to 0
+      my $new_number;
+      if ($area_code == "61") {
+        $new_number = substr($val, 0, 2, "0");
+        $area_code  = substr($val, 0, 2);
+      }
+      my $length = length($val);
+      if ( ($length < 10) || ($length > 10) ) {
+        die E->new( "The mobile phone number supplied is incorrect, must be 10 digits" );
+      }
+      return 1;
+    }
+
+---
+start:
+  qns:
+    - heading: PARTICIPANT CONSENT FORM
+
+    - text: |
+        <p>Consent to release of Medicare and/or Pharmaceutical Benefits Scheme (PBS) claims information, primary mental health care information, and headspace information, for the purposes of the Link-me study</p>
+        <div class="infobox consent">
+          <p>IMPORTANT INFORMATION</p>
+          <p>Complete this form to request the release of:</p>
+          <ul>
+            <li>personal Medicare claims information, and/or</li>
+            <li>PBS claims information, and/or</li>
+            <li>primary mental health care information, and/or</li>
+            <li>headspace information</li>
+          </ul>
+          to the Link-me Study. Incomplete forms may result in the study not being provided with your information. <strong>On the next page you will be asked what information, if any, you are willing for Link-me to access.</strong></p>
+          <p>By completing this form, I acknowledge that I have been fully informed and have been provided with information about this study. I have been given an opportunity to ask questions and understand the possibilities of disclosures of my personal information.</p>
+        </div>
+      html: 1
+
+    - slot:
+        name: title
+        label:
+          text: Title
+          position: aligned
+        type: select
+        options:
+          - Mr
+          - Mrs
+          - Miss
+          - Ms
+          - Other
+        mandatory: 1
+
+    - slot:
+        name: title_specify
+        class: not-bold
+        label:
+          text: "If 'Other', please specify"
+          position: aligned
+        type: text
+        size: 40
+        mandatory_if: title
+        mandatory: |
+              sub {
+                  my ($slot, $bytes, $ses) = @_;
+                  if ($ses->get($slot->mandatory_if) == 5) {
+                        return 1;
+                  }
+                        return 0;
+                }
+
+    - slot:
+        name: surname
+        label:
+          text: Family name
+          position: aligned
+        type: text
+        size: 40
+        mandatory: 1
+
+    - slot:
+        name: firstname
+        label:
+          text: First given name
+          position: aligned
+        type: text
+        size: 40
+        mandatory: 1
+
+    - slot:
+        name: othername
+        label:
+          text: Other given name(s)
+          position: aligned
+        type: text
+        size: 40
+
+
+    - slot:
+        name: dob
+        class: dobfield
+        label:
+          text: Date of birth
+          position: aligned
+        type: date
+        picker: none
+        mandatory: 1
+
+    - slot:
+        name: medicare_number
+        label:
+          text: Medicare card number
+          position: aligned
+        type: int
+        size: 11
+        min_val: 10000000000
+        max_val: 99999999999
+        mandatory: 1
+        check: |
+          sub {
+            my ($self, $val) = @_;
+
+            my $length = length($val);
+            if ( ($length < 11) || ($length > 11) ) {
+              die E->new( "Medicare card number should be 11 digits" );
+            }
+            return 1;
+          }
+
+
+    - slot:
+        name: address
+        class: mail-address
+        label:
+          text: Permanent address
+          position: aligned
+        type: textarea
+        rows: 3
+        cols: 40
+        mandatory: 1
+
+    - slot:
+        name: postal_address
+        class: mail-address
+        label:
+          text: Postal address (if different to above)
+          position: aligned
+        type: textarea
+        rows: 3
+        cols: 40
+
+
+
+---
+PAGE_001:
+  nav:
+    - first: Home
+    - next: Submit
+    - prev: Prev
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $conf           = SD::Config->load;
+      my $survey_session = $conf->{fetch_session}->($session->get('parent_session'), 'survey');
+
+      my $timestamp = time();
+
+      $survey_session->set(external_data_consent_complete => $timestamp);
+      $session->set(completed => $timestamp);
+
+      return 'completed';
+    }
+  qns:
+    - heading: PARTICIPANT CONSENT FORM
+
+    - text: |
+        <p>Consent to release of Medicare and/or Pharmaceutical Benefits Scheme (PBS) claims information, primary mental health care information, and headspace information, for the purposes of the Link-me study</p>
+        <h1>AUTHORISATION</h1>
+      html: 1
+
+    - text: |
+        <strong>I authorise the Department of Human services* to provide my:</strong>
+      html: 1
+
+    - slot:
+        name: authorise_medicare
+        label: Medicare claims history
+        class: not-bold
+        type: yes_no
+        mandatory: 1
+
+    - slot:
+        name: authorise_pbs
+        label: PBS claims history
+        class: not-bold
+        type: yes_no
+        mandatory: 1
+
+
+    - slot:
+        name: authorise_primary
+        label: "I authorise the Department of Health to provide my primary mental health care data"
+        type: yes_no
+        mandatory: 1
+
+    - slot:
+        name: authorise_headspace
+        label:  "I authorise headspace national office to provide my headspace data"
+        type: c_v
+        mandatory: 1
+        options:
+          - Yes
+          - No
+          - Not applicable, I am over 25
+
+
+    - text: |
+        <strong>For the period 01/10/2016 to 31/12/2019 to the Link-me study<br/><small></strong>*Note: The Department of Human Services can only extract 4.5 years of data (prior to the date of extraction). The consent period above may result in multiple extractions</small>
+      html: 1
+
+    - text: |
+        <h1>DECLARATION</h1>
+      html: 1
+
+    - slot:
+        name: declaration
+        type: c_v
+        mandatory: 1
+        options:
+          - I declare that the information on this form is true and correct.
+
+
+
+
+
+# Last page is not used!
+---
+last:
+  nav:
+    - first: Start
+    - prev: Prev
+    - next: Submit
+  next: sub { $_[1]->set(completed=>time()); 'completed' }
+  percent: 99
+  qns:
+    - text: "[% PROCESS last %]"
+      tt2: 1

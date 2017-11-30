@@ -1,0 +1,8 @@
+<h1>Index</h1>
+
+<p>
+ID: [% session.get('patient_id_prefix') %] <br/>
+[% session.get('next_patient_id') - 1 %] sessions created
+</p>
+
+<input name="action.create_survey" value="Create new survey" type="submit" />

@@ -1,0 +1,69 @@
+<p>From what you have told us, things seem to be difficult for you in these areas right now:</p>
+
+[%# See default/conf/common.pl for the `intervention_areas` functions %]
+[%
+  areas = conf.intervention_areas.keys().sort();
+  FOR area IN areas;
+    IF conf.intervention_areas.$area.difficult(session); %]
+      <img src='html/images/icon-[% area %].png' />
+    [% END;
+  END;
+%]
+
+<!--
+[% IF session.get('phq1') == 2 || session.get('phq1') == 3 %]
+    <img src="html/images/icon-little-interest.png" />
+[% END %]
+
+[% IF session.get('phq2') == 2 || session.get('phq2') == 3 %]
+    <img src="html/images/icon-text-mood.png" />
+[% END %]
+
+[% IF session.get('phq3') == 2 || session.get('phq3') == 3 %]
+    <img src="html/images/icon-text-sleep.png" />
+[% END %]
+
+[% IF session.get('phq4') == 2 || session.get('phq4') == 3 %]
+    <img src="html/images/icon-text-energy.png" />
+[% END %]
+
+[% IF session.get('phq5') == 2 || session.get('phq5') == 3 %]
+    <img src="html/images/icon-text-appetite.png" />
+[% END %]
+
+[% IF session.get('phq6') == 2 || session.get('phq6') == 3 %]
+    <img src="html/images/icon-text-self-image.png" />
+[% END %]
+
+[% IF session.get('phq7') == 2 || session.get('phq7') == 3 %]
+    <img src="html/images/icon-text-concentration.png" />
+[% END %]
+
+[% IF session.get('phq8') == 2 || session.get('phq8') == 3 %]
+    <img src="html/images/icon-text-movement.png" />
+[% END %]
+
+[% IF session.get('phq9') == 2 || session.get('phq9') == 3 %]
+    <img src="html/images/icon-text-thought-of-death.png" />
+[% END %]
+
+[% IF session.get('gad1') == 2 || session.get('gad1') == 3 %]
+    <img src="html/images/icon-text-anxiety.png" />
+[% END %]
+
+[% IF session.get('gad2') == 2 || session.get('gad2') == 3 %]
+    <img src="html/images/icon-text-worry.png" />
+[% END %]$
+
+[% IF session.get('sf1_health') == 4 || session.get('sf1_health') == 5 %]
+    <img src="html/images/icon-text-health.png" />
+[% END %]
+
+[% IF session.get('chronic') == 1 %]
+    <img src="html/images/icon-text-daily-activities.png" />
+[% END %]
+
+[% IF session.get('inc_mg') == 4 || session.get('inc_mg') == 5 %]
+    <img src="html/images/icon-text-economy.png" />
+[% END %]
+-->

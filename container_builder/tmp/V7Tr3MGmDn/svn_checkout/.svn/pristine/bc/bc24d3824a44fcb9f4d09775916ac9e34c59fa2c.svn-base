@@ -1,0 +1,42 @@
+/* Your CSS content goes here... */
+
+/* Header Styling to make image fill header */
+
+div.header {
+  margin:0;
+  padding:0;
+}
+
+li.right {
+  margin-bottom:0;
+  padding-bottom:0;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+div.header > ul, div.header > ul > li.right {
+  padding:0px;
+  margin:0px;
+}
+
+li.right > img.center {
+  margin:0px;
+}
+
+.content {
+  border-top:none;
+}
+
+/* Adding background */
+
+.content {
+  background-image:url("images/linkme-background.png");
+  background-repeat: no-repeat;
+  background-color: #0080c1;
+}
+
+/* Websurvey Maroon Overrides */
+
+div.content > h1, div.content > h2, div.content > h3, div.content > h4,{
+color: #002e6d!important;
+}

@@ -1,0 +1,30 @@
+---
+close: 0
+component_id: 92a233f4-0d5b-4ad9-a40e-f691b1edac2f
+frontend_urls:
+  production: https://link-me.study/appointment-summary
+  staging: https://university-melbourne.staging.websurvey.net.au/link-me/appointment-summary
+  testing: https://university-melbourne.testing.websurvey.net.au/link-me/appointment-summary
+  development: http://localhost:5556/appointment-summary
+get_session:
+  SessionFrom: CGIParam
+  CreateSession: Never
+progress_meter: 1
+session_parameter: SD_KEY
+style: responsive
+survey_title: Appointment Summary
+template_version: '6'
+y2p:
+  Processors:
+  - PageOrder
+  - Percent
+  - UploadForm
+banner:
+  - filename: linkme-surveyheader.png
+    alt: Link Me Logo
+    align: right
+extra_js:
+  - following_questions.js
+  - expandable_tree.js
+  - calculation.js
+  - specify_other.js

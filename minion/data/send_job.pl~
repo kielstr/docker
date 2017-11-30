@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Minion;
+use Data::Dumper 'Dumper';
+
+# Connect to backend
+my $minion = Minion->new(Pg => 'postgresql://kiel:Tripper@kiels-laptop/test');
+
+# Add tasks
+$minion->enqueue(build_img => [ 'test', 'image' ]);
+
+$minion->perform_jobs;

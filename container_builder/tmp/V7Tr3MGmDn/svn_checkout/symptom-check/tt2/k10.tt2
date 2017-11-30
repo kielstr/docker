@@ -1,0 +1,55 @@
+[%
+  # slot names are k1 to k10
+  component   = 'symptom-check';
+  session_key = args.session_key;
+
+  session          = conf.fetch_session(session_key, component);
+  component_config = conf.get_component_config(component);
+
+  # All slots are on the start page.
+
+  page = 'start';
+  slots = ['k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7', 'k8', 'k9', 'k10'];
+
+  total_score = 0;
+%]
+
+<h1>K10+ Results</h1>
+
+<table class='bordered_table'>
+  <thead>
+    <th>Question</th>
+    <th>Response</th>
+  </thead>
+  <tbody>
+    [% FOR slot_name IN slots %]
+      [% slot = component_config.pages.$page.slot(slot_name) %]
+      [% val = session.get(slot.name) %]
+      [% total_score = total_score + val %]
+      <tr>
+        <td>[% PROCESS lbl q=slot.label %]</td>
+        <td>[% session.get(slot.name) %]</td>
+      </tr>
+    [% END %]
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>Total</th>
+      <td>[% total_score %]</td>
+    </tr>
+    <tr>
+      <th>Level of psychological distress</th>
+      <td>
+      [% IF total_score <= 15 %]
+        LOW
+      [% ELSIF total_score > 15 && total_score <= 21 %]
+        MODERATE
+      [% ELSE %]
+        HIGH
+      [% END %]
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+<a class='ws-button' href="[% conf.admin_site_https_urls.${ conf.surveymeta.deployment } %]/unimelb/link_me/index#/">Back to portal</a>

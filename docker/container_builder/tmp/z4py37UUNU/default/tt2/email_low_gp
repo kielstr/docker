@@ -1,0 +1,15 @@
+Subject: Your patient's Link-me treatment recommendation
+
+<h4>Dear [GP name]</h4>
+
+<p>Your patient [% firstname -%] [% surname -% is taking part in the Link-me trial. Based on [his/her] responses to survey items [he/she] was allocated to the low intensity group.</p>
+
+<p>[He/she] reported difficulties with [list_difficult1] [and list_difficult2] and selected [list_support1] [and list_support2]. </p>
+
+<p>You may wish to discuss these services with [First name] the next time you see [him/her]. If you have any questions please discuss with the Link-me care navigator in your practice.</p>
+
+<p>Thank you</p>
+
+<p>The Link-me team</p>
+
+

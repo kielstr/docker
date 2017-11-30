@@ -1,0 +1,46 @@
+[%- SET style="just_content" -%]
+[%-
+    USE date;
+
+    component = 'symptom-check';
+    survey_session_key = args.survey_session_key;
+    cn_session_key      = args.cn_session_key;
+
+    # Ensure valid care navigator session!
+    cn_session     = conf.fetch_session(cn_session_key, 'care-navigator');
+    survey_session = conf.fetch_session(survey_session_key, 'survey');
+
+    IF cn_session && survey_session_key;
+        find_parent_session_key = conf.find_session('patient', 'survey_session_key', survey_session_key);
+
+        new_session = conf.create_component_session(component);
+        CALL new_session.set('parent_session', find_parent_session_key);
+        CALL new_session.set('patient_id', survey_session.get('patient_id'));
+        CALL new_session.set('survey_session_key', survey_session_key);
+        CALL new_session.set('created', date.now);
+
+        session_key    = new_session.session_key;
+        component_conf = conf.get_component_config(component);
+        component_url  = component_conf.webserver_info().fe_url;
+-%]
+
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>[% conf.survey_title %]</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta http-equiv="REFRESH" content="0;url=[% component_url %]/q?SD_KEY=[% session_key %]&page=[% args.page || 'start' %]">
+</head>
+<body bgcolor="#FFFFFF" link="#003399" vlink="#999999">
+<p>Redirecting..</p>
+</body>
+</html>
+
+[% ELSE %]
+[%# No cn session, so invalid %]
+[% SET style = 'responsive' %]
+<p>Oops! It looks like there might be a problem with your account. Please contact the National Trial Coordinator at <a href="mailto:link-me@unimelb.edu.au">link-me@unimelb.edu.au</a> for assistance.</p>
+<p>Thank you.</p>
+[% END %]

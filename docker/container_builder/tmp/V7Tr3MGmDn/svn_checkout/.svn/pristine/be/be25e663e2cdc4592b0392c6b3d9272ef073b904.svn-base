@@ -1,0 +1,25 @@
+[%# HACK - first attempt at pretty printing of select fields.
+  Only selected values shown
+  # Copied from select master survey summary and modified for custom value
+%]
+
+<span class="select-widget">
+[% val_list = val %]
+[% UNLESS val.length == 0 %]
+  [% val_list = val.list %]
+[% ELSE %]
+  [ Not Required ]
+[% END %]
+
+[% FOREACH opt = s.options %]
+  [%- SET value = opt.0 %]
+  [%- SET text  = opt.1 %]
+
+  [% FOREACH v = val_list %]
+    [% IF v == value %]
+      [% text %]
+    [% END %]
+  [% END %]
+
+[%- END %]
+</span>

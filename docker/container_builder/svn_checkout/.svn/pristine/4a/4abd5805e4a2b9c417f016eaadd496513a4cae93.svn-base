@@ -1,0 +1,25 @@
+Subject: Your Link-me resources
+
+<h4>Dear [% firstname -%]</h4>
+
+<p>Thanks for taking part in Link-me.</p>
+
+<p>Based on your answers to the Link-me survey, the following services might be useful: </p>
+
+[Service #1]	[Service #2]	[Service #3]
+[Service #4]	[Service #5]	[Service #6]
+
+<p>If at any time you feel like you need extra help to manage your mental health, please talk to your GP. We have also attached a list of other services you might find useful; all have excellent websites and most have helplines that are available 24 hours a day, seven days a week. They're all totally confidential and are staffed by trained counsellors.</p>
+
+<h4>A special request from us</h4>
+
+<p>To help us understand more about how the Link-me approach works we would like to access routinely collected data about your use of health services. To do this we need you to give permission by completing this form. You can read more about this in the information sheet attached. You can still take part in Link-me even if you don't want us to access this information.</p>
+
+<h4>What next?</h4>
+
+<p>We will follow-up with you in about 6 months to see how things are going for you. We will email you a short survey to complete, so please let us know if your details change. If you have any questions about Link-me please feel free to contact us at <a href="mailto:link-me@unimelb.edu.au.">link-me@unimelb.edu.au.</a>.</p>
+
+<p>Thank you</p>
+
+<p>The Link-me team</p>
+

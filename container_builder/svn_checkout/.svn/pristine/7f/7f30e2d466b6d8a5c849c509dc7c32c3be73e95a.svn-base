@@ -1,0 +1,33 @@
+#!/bin/bash
+
+SURVEYS_DIR=/surveys
+
+function push_sessions_file {
+    echo "Pushing sessions file $2 for $1"
+    ws-database -q -c $SURVEYS_DIR/$1/conf/config.pl -s $SURVEYS_DIR/$1/sessions/$2
+}
+
+# default
+push_sessions_file default variables.yaml
+push_sessions_file default test-sessions.yaml
+
+# survey
+push_sessions_file survey variables.yaml
+
+# patient
+push_sessions_file patient variables.yaml
+
+# action-plan
+push_sessions_file action-plan variables.yaml
+
+# external-data-consent
+push_sessions_file external-data-consent variables.yaml
+
+# symptom-check
+push_sessions_file symptom-check variables.yaml
+
+# appointment-summary
+push_sessions_file appointment-summary variables.yaml
+
+# care-navigator
+push_sessions_file care-navigator variables.yaml

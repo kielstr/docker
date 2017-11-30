@@ -1,0 +1,28 @@
+[% html_class = "summary" %]
+[% conf.banner_heading = 'Summary View' %]
+
+[%
+  session_key = args.SD_KEY;
+  session     = conf.fetch_session(session_key, 'survey');
+
+  page_objects = conf.walk_pages(session, 'survey');
+%]
+
+<h1 class="hide_on_print">Summary View</h1>
+<div class="infobox infobox-print">
+  Patient name: [% session.get('firstname') %] [% session.get('surname') %]<br/>
+  Date of birth: [% session.get('dob') || 'N/A' %]<br/>
+  Phone: [% session.get('phone') || 'N/A' %]<br/>
+  Email: [% session.get('email') || 'N/A' %]<br/>
+  Address: [% session.get('address') || 'N/A' %]<br/>
+</div>
+
+<input class="hide_on_print" type="button" value="Print" onClick="window.print()">
+
+[%
+  FOREACH page_object IN page_objects;
+    NEXT IF page_object.summary_view == 0;
+    '<span id="' _ page_object.name _ '"></span>';
+    INCLUDE 'summary_page.tt2' summary_view=1 widget_set='summary' session=session page=page_object;
+  END;
+%]

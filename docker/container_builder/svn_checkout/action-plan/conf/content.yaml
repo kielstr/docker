@@ -1,0 +1,865 @@
+# Prototypes
+c_v:
+  type: choice
+  widget: choice_v
+
+c_h:
+  type: choice
+  widget: choice_h
+
+mc_v:
+  type: multichoice
+  widget: choice_v
+  check: |
+        sub {
+            my ($slot, $value)  = @_;
+            my %answer          = map {$_ => 1} @{$value};
+            my $text_value;
+            my $open_value;
+            if ( defined $slot->open ) {
+              foreach (@{$value}) {
+                if (/\D/ || $_ >= @{$slot->options}) {
+                  $text_value += 1;
+                }
+              }
+              foreach (@{$slot->open}) {
+                if (exists $answer{$_}) {
+                  $open_value += 1;
+                }
+              }
+              if ($text_value != $open_value) {
+                die E->new( "A response is required" );
+                return 0;
+              }
+              return 1;
+            } else {
+              return 1;
+            }
+          }
+
+mc_h:
+  type: multichoice
+  widget: choice_h
+
+# db_upload - upload slot that stores data in our database
+db_upload:
+  type: upload
+  store_class: 'SD::Slot::Upload::Store::Database'
+
+# datepicker - date slot with jQuery datepicker
+datepicker:
+  type: date
+  widget: datepicker
+  class: datepicker
+
+#
+# Often used
+#
+
+# yes_no - choice with yes or no
+yes_no:
+  type: choice
+  widget: choice_v
+  options:
+    - Yes
+    - No
+
+#
+# Stubs for larger widgets
+#
+
+# tree - org_tree_expand select type with sane check and options subs
+tree:
+  type: choice
+  widget: org_tree_expand
+  check: |
+    sub {
+       my ($self, $item) = @_;
+       unless($item =~ /^\d+$/ && $item >= 1 && $item <= scalar @{ $self->options } ){
+           die E->new("Not one of allowed responses");
+       }
+       return 1;
+    }
+  options: |
+    sub {
+      my $self = shift;
+      use Data::Rmap qw/:all/;
+      return [ rmap_to {
+        return cut( $_->{text} ) if (ref $_ eq 'HASH');
+        return $_ unless ref $_;
+        return shift->recurse;
+      } HASH|ARRAY|VALUE, @{$self->tree} ];
+    }
+
+
+# ranking - a record slot that handles 'rank the following' type questions
+ranking:
+  type: record
+  mandatory: |
+    sub {
+      my $self = shift;
+      return 1 unless defined $_[0];
+      return ! $self->normalize(@_);
+    }
+  # XXX: normalize is depreciated, but.. currently there is no simple
+  # way to override the check sub to run code after the subslot validation
+  normalize: |
+    sub {
+      my( $self, $val ) = @_;
+      my %val_counts;
+      for my $slt ( @{ $self->columns } ) {
+        next if ! exists $val->{ $slt->name }; # Should this be var_name
+        my $v = $val->{ $slt->name };
+        next if (! defined $v || $v =~ /^\s*$/);
+        if ( $val_counts{$v}++ ) {
+          die E->new("More than one criterion has the same ranking ($v)");
+        }
+      }
+      unless ( scalar keys %val_counts == $self->columns->[0]->max_val ) {
+        die E::Skip->new("You must rank the criterion from ".
+          $self->columns->[0]->min_val." to ".$self->columns->[0]->max_val );
+      }
+      return 1;
+    }
+
+
+# You can add more here
+
+email_check:
+  type: text
+  input_type: email
+  widget: textfield
+  size: 80
+  check: |
+    sub {
+      my $self = shift;
+
+      if ($self->exists(@_)) {
+        die E->new("Email already exists");
+      }
+      # Normalize
+      my $email = Email::Valid->address( -address => lc $_[0], -mxcheck => 1 );
+      if ( ! $email ) {
+        die E->new( "You must supply a valid email address (not $_[0])" );
+      }
+      $_[0] = $email;
+      return !! $email;
+    }
+
+phone_check:
+  type: int
+  class: consent
+  min_val: 0
+  max_val: 9999999999
+#  mandatory: 1
+  check: |
+    sub {
+      my $self = shift;
+      $self->super(@_);
+
+      if ($self->exists(@_)) {
+        die E->new("Phone number already exists");
+      }
+
+      my $val = shift;
+
+      my $area_code = substr($val, 0, 2);
+      # Converting international prefix of 61 to 0
+      my $new_number;
+      if ($area_code == "61") {
+        $new_number = substr($val, 0, 2, "0");
+        $area_code  = substr($val, 0, 2);
+      }
+      my $length = length($val);
+      if ( ($length < 10) || ($length > 10) ) {
+        die E->new( "The mobile phone number supplied is incorrect, must be 10 digits" );
+      }
+      return 1;
+    }
+
+
+k10_scale:
+  type: choice
+  widget: choice_v
+  options:
+    - None of the time
+    - A little of the time
+    - Some of the time
+    - Most of the time
+    - All of the time
+
+
+---
+start:
+  portal: redirect_to_admin
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $config = SD::Config->load;
+      my $patient_session = $config->{fetch_session}->($session->get('survey_session_key'), 'survey');
+
+      my $difficult_areas = $patient_session->get('q2');
+      my $number_of_areas = @$difficult_areas;
+
+      if ($number_of_areas < 2) {
+        return 'PAGE_care_nav_action_3_last';
+      }
+
+      return 'PAGE_care_nav_action_2';
+    }
+  nav_actions:
+    portal: 1
+    next: 1
+    prev: 0
+    show: 1
+  nav:
+    - next: Next
+    - portal: Back to Portal
+# 'Care Navigation - Action plan'
+  qns:
+    - heading: "Action plan"
+    - text: "[% PROCESS 'crud-summary-header' IF summary_view %]"
+      tt2: 1
+
+    - text: |
+        [% patient_session = conf.fetch_session(session.get('survey_session_key'), 'survey'); areas_of_difficulty = patient_session.get('q2'); first = areas_of_difficulty.first; second = areas_of_difficulty.last; %]
+        <h2><strong>[% conf.intervention_areas.$first.sentence_text %]</strong></h2>
+      tt2: 1
+
+    - slot:
+        name: difficult1_achieve_what
+        class: not-bold
+        label:
+          text: |
+              <p><strong>WHAT I WANT TO ACHIEVE</strong><br/>
+              What kinds of things are important to you, which are affected by your problems in this area?</p>
+              <p>What would you like to be doing, that you’re finding difficult at the moment because of these issues?</p>
+              <p>(If you like, I can provide some suggestions that other people have found useful)</p>
+              <p>What do you think you would you like to focus on?</p>
+          html: 1
+        type: textarea
+        rows: 4
+        cols: 80
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+
+    - slot:
+        name: difficult1_achieve_how
+        class: not-bold
+        label:
+          text: |
+              <p><strong>HOW I WANT TO ACHIEVE IT</strong><br/>
+              What ideas do you have for how you could work towards achieving your goals?</p>
+              <p>What do you know about the options that are available to help</p>
+              <p>(If you like, I can provide some suggestions that other people have found useful)</p>
+              <p>What action(s) would you be most comfortable and confident with taking?</p>
+          html: 1
+        type: textarea
+        rows: 4
+        cols: 80
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+    - text: <strong>AGREED ACTION</strong>
+      html: 1
+    - widget: multi_textbox_table
+      rows:
+        -
+          - slot:
+              name: difficult1_referral_1
+              label: REFERRAL 1
+              type: select
+              options:
+                - Psychologist
+                - Psychiatrist
+                - Social worker
+                - Exercise physiologist
+                - Dietitian
+                - Other (specify)
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+          - slot:
+              name: difficult1_referral_1_other_specify
+              class: not-bold
+              label: If 'Other', please specify
+              type: text
+              size: 70
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+        -
+          - slot:
+              name: difficult1_resource_1
+              label: RESOURCES 1
+              type: select
+              options:
+                - Online
+                - App
+                - 'Self-help'
+                - Other (specify)
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+          - slot:
+              name: difficult1_resource_1_other_specify
+              class: not-bold
+              label: If 'Other', please specify
+              type: text
+              size: 70
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+        -
+          - slot:
+              name: difficult1_referral_2
+              label: REFERRAL 2
+              type: select
+              options:
+                - Psychologist
+                - Psychiatrist
+                - Social worker
+                - Exercise physiologist
+                - Dietitian
+                - Other (specify)
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+          - slot:
+              name: difficult1_referral_2_other_specify
+              class: not-bold
+              label: If 'Other', please specify
+              type: text
+              size: 70
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+        -
+          - slot:
+              name: difficult1_resource_2
+              label: RESOURCES 2
+              type: select
+              options:
+                - Online
+                - App
+                - 'Self-help'
+                - Other (specify)
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+          - slot:
+              name: difficult1_resource_2_other_specify
+              class: not-bold
+              label: If 'Other', please specify
+              type: text
+              size: 70
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+
+
+    - slot:
+        name: difficult1_review_progress
+        class: not-bold
+        label:
+          text: |
+              <p><strong>REVIEWING PROGRESS</strong><br/>
+              How have you been going with the actions you planned to take?</p>
+              <p>How have the actions you’ve taken so far been helpful?</p>
+              <p>What have been some of the difficulties in making changes to improve your [% conf.intervention_areas.$first.sentence_text %]?</p>
+              <p>What steps might be helpful to overcome these difficulties?</p>
+              <p>Do you need any additional information or support?</p>
+          tt2: 1
+        type: textarea
+        rows: 4
+        cols: 80
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+
+
+---
+PAGE_care_nav_action_2:
+  portal: redirect_to_admin
+  nav_actions:
+    portal: 1
+    next: 1
+    prev: 1
+    show: 1
+  nav:
+    - next: Next
+    - prev: Prev
+    - portal: Back to Portal
+# 'Care Navigation - Action plan'
+  qns:
+    - heading: "Action plan"
+    - text: |
+        [% patient_session = conf.fetch_session(session.get('survey_session_key'), 'survey'); areas_of_difficulty = patient_session.get('q2'); first = areas_of_difficulty.first; second = areas_of_difficulty.last %]
+        <h2><strong>[% conf.intervention_areas.$second.sentence_text %]</strong></h2>
+      tt2: 1
+
+    - slot:
+        name: difficult2_achieve_what
+        class: not-bold
+        label:
+          text: |
+              <p><strong>WHAT I WANT TO ACHIEVE</strong><br/>
+              What kinds of things are important to you, which are affected by your problems in this area?</p>
+              <p>What would you like to be doing, that you’re finding difficult at the moment because of these issues?</p>
+              <p>(If you like, I can provide some suggestions that other people have found useful)</p>
+              <p>What do you think you would you like to focus on?</p>
+          html: 1
+        type: textarea
+        rows: 4
+        cols: 80
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+
+
+    - slot:
+        name: difficult2_achieve_how
+        class: not-bold
+        label:
+          text: |
+              <p><strong>HOW I WANT TO ACHIEVE IT</strong><br/>
+              What ideas do you have for how you could work towards achieving your goals?</p>
+              <p>What do you know about the options that are available to help</p>
+              <p>(If you like, I can provide some suggestions that other people have found useful)</p>
+              <p>What action(s) would you be most comfortable and confident with taking?</p>
+          html: 1
+        type: textarea
+        rows: 4
+        cols: 80
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+
+
+    - text: <strong>AGREED ACTION</strong>
+      html: 1
+    - widget: multi_textbox_table
+      rows:
+        -
+          - slot:
+              name: difficult2_referral_1
+              label: REFERRAL 1
+              type: select
+              options:
+                - Psychologist
+                - Psychiatrist
+                - Social worker
+                - Exercise physiologist
+                - Dietitian
+                - Other (specify)
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+
+          - slot:
+              name: difficult2_referral_1_other_specify
+              class: not-bold
+              label: If 'Other', please specify
+              type: text
+              size: 70
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+
+        -
+          - slot:
+              name: difficult2_resource_1
+              label: RESOURCES 1
+              type: select
+              options:
+                - Online
+                - App
+                - 'Self-help'
+                - Other (specify)
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+
+          - slot:
+              name: difficult2_resource_1_other_specify
+              class: not-bold
+              label: If 'Other', please specify
+              type: text
+              size: 70
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+
+        -
+          - slot:
+              name: difficult2_referral_2
+              label: REFERRAL 2
+              type: select
+              options:
+                - Psychologist
+                - Psychiatrist
+                - Social worker
+                - Exercise physiologist
+                - Dietitian
+                - Other (specify)
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+
+          - slot:
+              name: difficult2_referral_2_other_specify
+              class: not-bold
+              label: If 'Other', please specify
+              type: text
+              size: 70
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+
+        -
+          - slot:
+              name: difficult2_resource_2
+              label: RESOURCES 2
+              type: select
+              options:
+                - Online
+                - App
+                - 'Self-help'
+                - Other (specify)
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+
+          - slot:
+              name: difficult2_resource_2_other_specify
+              class: not-bold
+              label: If 'Other', please specify
+              type: text
+              size: 70
+              default: |
+                sub {
+                  my ($slot, $session) = @_;
+                  my $conf         = SD::Config->load;
+                  my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+                  return $last_session ? $last_session->get($slot->name) : "";
+                }
+
+
+
+
+    - slot:
+        name: difficult2_review_progress
+        class: not-bold
+        label:
+          text: |
+              <p><strong>REVIEWING PROGRESS</strong><br/>
+              How have you been going with the actions you planned to take?</p>
+              <p>How have the actions you’ve taken so far been helpful?</p>
+              <p>What have been some of the difficulties in making changes to improve your [% conf.intervention_areas.$second.sentence_text %]?</p>
+              <p>What steps might be helpful to overcome these difficulties?</p>
+              <p>Do you need any additional information or support?</p>
+          tt2: 1
+        type: textarea
+        rows: 4
+        cols: 80
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+
+---
+PAGE_care_nav_action_3_last:
+  portal: redirect_to_admin
+  next: sub { $_[1]->set(considered_complete => time()); 'redirect_to_admin' }
+  nav_actions:
+    portal: 1
+    next: 1
+    prev: 1
+    show: 1
+  nav:
+    - next: Complete Form
+    - prev: Prev
+    - portal: Back to Portal
+# 'Care Navigation - Action plan'
+  qns:
+    - heading: "Action plan"
+
+    - slot:
+        name: making_work
+        class: not-bold
+        label:
+          text: |
+              <p><strong>MAKING IT WORK</strong><br/>
+              Can you think of any signs that might mean you need extra support to improve your emotional health and wellbeing?</p>
+              <p>Who do you think you could talk to if you felt like you needed extra help?</p>
+              <p>What have you done in the past to help you manage when you’re going through an especially hard time?</p>
+              <p>(If you like, I can provide some suggestions about supports that other people have found useful)</p>
+          html: 1
+        type: textarea
+        rows: 4
+        cols: 80
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+    - slot:
+        name: understanding_emotional
+        class: not-bold
+        label:
+          text: |
+              <p><strong>UNDERSTANDING EMOTIONAL HEALTH AND WELLBEING</strong><br/>
+              One of the goals of Link-me care navigation is to provide you with information about how to manage your emotional health and wellbeing. Do you feel like you have all the information you need?</p>
+              <p>If not, what else would you like to know or like me to follow-up?</p>
+          html: 1
+        type: textarea
+        rows: 4
+        cols: 80
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+    - slot:
+        name: completing_gp
+        class: not-bold
+        label:
+          text: |
+              <p><strong>COMPLETING THE PLAN WITH YOUR GP</strong></p>
+              <p><strong>MENTAL STATE EXAMINATION</strong></p>
+          html: 1
+        type: textarea
+        rows: 4
+        cols: 80
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+    - slot:
+        name: risk_assessment
+        class: not-bold
+        label:
+          text: |
+              <p><strong>RISK ASSESSMENT</strong><br/>
+              The Link-me iPad survey asked you how often you had been bothered by thoughts about hurting yourself.</p>
+              [% patient_session = conf.fetch_session(session.get('survey_session_key'), 'survey'); phq9 = patient_session.get('phq9'); %]
+              <p>You answered <strong>[% conf.get_component_config('survey').pages.PAGE_009C.slot('phq9').perdy_value(phq9) %]</strong>. Has this changed at all since then?</p>
+          tt2: 1
+        type: textarea
+        rows: 4
+        cols: 80
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+    - slot:
+        name: provisional_diagnosis
+        class: not-bold
+        label:
+          text: |
+              <p><strong>PROVISIONAL DIAGNOSIS</strong><br/>
+              Based on his/her knowledge of your current issues, your GP thinks  you are most likely experiencing a(n):</p>
+          html: 1
+        type: select
+        options:
+          - Anxiety disorder
+          - Mood disorder
+          - Substance use disorder
+          - Psychotic disorder
+          - A disorder with onset usually occurring in childhood and adolescence not listed elsewhere
+          - Other mental disorder
+          - No formal mental disorder but sub-syndromal problem
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+    - slot:
+        name: chance_talk_yourself
+        class: not-bold-options
+        label: "Have you:"
+        type: c_v
+        options:
+          - Had a chance to talk about yourself, your treatment experience and preferences, and your emotional health and wellbeing?
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+
+    - slot:
+        name: developed_action_plan
+        class: not-bold-options
+        type: c_v
+        options:
+          - Developed an action plan and set a date for review?
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+
+    - slot:
+        name: offered_plan
+        class: not-bold-options
+        type: c_v
+        options:
+          - Been offered a copy of this plan to keep?
+        default: |
+          sub {
+            my ($slot, $session) = @_;
+            my $conf         = SD::Config->load;
+            my $last_session = $conf->{fetch_session}->($session->get('last_action_plan'), 'action-plan');
+            return $last_session ? $last_session->get($slot->name) : "";
+          }
+
+
+    - text: |
+        <p><strong>CONGRATULATIONS, YOU HAVE COME UP WITH AN ACTION PLAN TO ACHIEVE YOUR GOALS AND IMPROVE YOUR WELLBEING</strong></p>
+      html: 1
+
+
+
+---
+last:
+  nav:
+    - first: Start
+    - prev: Prev
+    - next: Submit
+  next: sub { $_[1]->set(completed=>time()); 'completed' }
+  percent: 99
+  qns:
+    - text: "[% PROCESS last %]"
+      tt2: 1
+
+---
+redirect_to_admin:
+    template: 'back-to-admin-site'

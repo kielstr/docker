@@ -1,0 +1,82 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+	<title>
+	[% IF page.qns.0.heading %]
+	[% page.qns.0.heading | html %] -
+		[% END %]
+	[% conf.banner_heading %]
+	[% IF conf.banner_subheading %]
+		- [% conf.banner_subheading %]
+	[% END %]
+	</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=[% conf.survey_charset || 'utf-8' %]" />
+	<meta name="keywords" content="strategic,data,web,survey" />
+    <meta name="description" content="strategic data web survey" />
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+	<link href="static/css/jquery-ui-1.8.13.custom.css" rel="stylesheet" type="text/css" title="stylesheet"/>
+	<link href="static/css/modern.css" rel="stylesheet" type="text/css" title="stylesheet"/>
+	<link href="static/css/widgets.css" rel="stylesheet" type="text/css" title="stylesheet"/>
+	<link href="static/css/mobile.css" rel="stylesheet" type="text/css" title="stylesheet"/>
+    <link rel="stylesheet" href="html/static/css/modal.css">
+
+	[%- # NOTE: local.css is a per-survey override. Its path is html/ not static/ . -%]
+	<link href="html/local.css" rel="stylesheet" type="text/css" title="stylesheet"/>
+
+<!--[if lte IE 7 ]>
+<link href="static/css/ie7.css" rel="stylesheet" type="text/css">
+<![endif]-->
+<!--[if IE ]>
+<link href="static/css/ie.css" rel="stylesheet" type="text/css">
+<![endif]-->
+
+    <script src="html/static/js/jquery-1.11.1.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+	<script type="text/javascript" src="static/js/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="static/js/jquery-ui-1.8.13.custom.min.js"></script>
+	<script type="text/javascript" src="static/js/jquery.calculation.min.js"></script>
+	<script type="text/javascript" src="static/js/sd_survey_fns.js"></script>
+    <script src="html/static/js/bootstrap.min.js"></script>
+    <script src="html/static/js/modal.js"></script>
+    <script language="javascript" type="text/javascript" src="html/static/js/following_questions.js"></script>
+
+	[%+ head_extra %]
+
+</head>
+<body [% body_attr %]>
+<div class="wrapper">
+[%- PROCESS top_banner %]
+<div class="content">
+[%- error WRAPPER error_msg # tt2 %]
+[%- err WRAPPER error_msg # me %]
+[%- content -%]
+</div>
+[%- PROCESS debug IF conf.allow_debug && args.debug -%]
+<div class="footer">
+<a target="blank" href="http://www.websurvey.com.au/">
+<img src="static/images/websurvey_small.gif" alt="Powered by WebSurvey" title="Opens the WebSurvey website in a new window"/>
+</a>
+</div>
+</div>
+
+  <div id="glossary-term-container" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" aria-labelledby="term-label" aria-describedby="modalDescription">
+    <div class="modal-dialog" role="document">
+      <div id="modalDescription" class="screen-reader-offscreen">
+        Beginning of dialog window. It begins with a heading 1 with the glossary term in it. Escape will close the window.
+      </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 id="term-label" class="modal-title" tabindex="1">Definition</h1>
+        </div>
+        <div class="modal-body" tabindex="2">
+          <img src="html/images/loading.gif" alt="gif to depict that page is being loaded" />
+        </div>
+        <a href="javascript:void(0)" type="button" class="close modalCloseButton" data-dismiss="modal" aria-hidden="true" tabindex="4">&times;</a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

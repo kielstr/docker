@@ -1,0 +1,13 @@
+/* Your CSS content goes here... */
+
+body > div > div.content > div.form_element > form > div.row > fieldset > div > table > tbody > tr > td:nth-child(4)
+
+#address, #practice_address {
+width: 495px;
+margin: 4px;
+}
+
+/* Fixes alignment of datepicker on new appointment form */
+div.date > input, input[name^="new.appointment_time"], {
+	margin: 0rem!important;
+}

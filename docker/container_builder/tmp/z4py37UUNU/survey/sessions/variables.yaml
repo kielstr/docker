@@ -1,0 +1,33 @@
+---
+- patient_id
+- parent_session
+- created
+- started
+- ineligible
+# These are all for the algorithm.
+- gender_collapsed
+- phqdep_total
+- gad_total
+- gad1r
+- gad2r
+- gad_max
+- ever_depressed
+- sf1_health_collapse
+- inc_mg_collapse
+- anxiety_predict
+- depression_predict
+- severity
+- group
+- gp_email_sent
+- phn
+- practice
+- location
+- consent_email_sent
+- list_difficult1
+- list_difficult2
+- first_area_of_difficulty
+- second_area_of_difficulty
+- screening_complete
+- eligible
+- external_data_consent_complete
+- out_of_study

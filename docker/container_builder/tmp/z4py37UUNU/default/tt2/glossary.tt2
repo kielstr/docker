@@ -1,0 +1,59 @@
+[%- glossary_data  = conf.glossary_data -%]
+
+<!-- Shows glossary page when no-js -->
+[% UNLESS in_survey %]
+<div class="static_glossary">
+  <h1>Glossary</h1>
+  <div class="glossary_links">
+    <ol>
+    [% FOR entry IN glossary_data %]
+      <li><a href="#dfn_[% entry.term %]">[% entry.term %]</a></li>
+    [% END %]
+    </ol>
+  </div>
+  [% FOR entry IN glossary_data %]
+    [% INCLUDE do_glossary %]
+  [% END %]
+</div>
+[% END %]
+
+<!-- Generates glossary modals for the page which can be called with js -->
+[% FOR entry IN glossary_data %]
+<div id="[% entry.term.remove('( |\?|/|\|_|[()])') %]" class="modal modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <span class="start_dialog sr-only" tabindex="1">Start of dialog</span>
+      <div class="modal-header">
+        <h1>[% entry.term %]</h1>
+        <a  class="modalCloseButton" href="javascript:void(0)" data-dismiss="modal"
+            title="Close information window" tabindex="2">
+        <i class="fa fa-times"></i>
+        <span class="sr-only">Select here or press escape to close dialog</span>
+        </a>
+      </div>
+      <div class="modal-body">
+        [% INCLUDE do_glossary %]
+      </div>
+      <span class="sr-only" tabindex="3">End of dialog</span>
+    </div>
+  </div>
+</div>
+[% END %]
+
+<script type="text/javascript">
+$(function(){
+  [% FOR entry IN glossary_data %]
+    modal_set_up("start_[% entry.term %]", "[% entry.term %]");
+  [% END %]
+});
+</script>
+
+[%- BLOCK do_glossary %]
+<div class="glossary_dfn">
+  <dl id="dfn_[% term.term %]">
+    [% FOR line IN entry.definition %]
+      <dd>[% line %]</dd>
+    [% END %]
+  </dl>
+</div>
+[% END %]

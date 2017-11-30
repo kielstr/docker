@@ -1,0 +1,2074 @@
+# Prototypes
+c_v:
+  type: choice
+  widget: choice_v
+
+c_h:
+  type: choice
+  widget: choice_h
+
+mc_v:
+  type: multichoice
+  widget: choice_v
+
+mc_h:
+  type: multichoice
+  widget: choice_h
+
+# db_upload - upload slot that stores data in our database
+db_upload:
+  type: upload
+  store_class: 'SD::Slot::Upload::Store::Database'
+
+# datepicker - date slot with jQuery datepicker
+datepicker:
+  type: date
+  widget: datepicker
+  class: datepicker
+
+
+#
+# Often used
+#
+
+custom_value:
+  type: c_v
+  widget: custom_value_select
+  option_keys: |
+    sub {
+      my $self = shift;
+      # XXX: Use a preprocessor to pre-calculate and store this result
+      my $ctr = 0;
+      return { map { $_->[0] => $ctr++ } @{ $self->options } }
+    }
+  check: |
+    sub {
+      my ( $self, $item ) = @_;
+      return 1 if ( $self->open );
+      # $item must be a valid key to the option_keys hash
+      my $keys = $self->option_keys;
+      die E->new("Not one of the allowed responses") unless exists $keys->{$item};
+      return 1;
+    }
+  pretty_value: |
+    sub {
+      my ( $self, $val ) = @_;
+      my $keys = $self->option_keys;
+      return $self->options->[ $keys->{$val} ]->[1];
+    }
+
+y_n:
+  type: choice
+  options:
+    - 1: 'Yes'
+    - 0: 'No'
+  widget: choice_h_altvals
+  class: ynd
+  check: |
+    sub {
+      my ($self, $val) = @_;
+      # options is: [ { 0 => 'No' }, { 1 => 'Yes' } ]
+      my %opts = map { %$_ } @{ $self->options };
+      #  %opts: { 0 => 'No', 1 => 'Yes' }
+      unless ($opts{$val}) { # assume "true" labels
+          die E->new("Not one of allowed responses");
+      }
+      return 1;
+    }
+  perdy_value: |
+    sub {
+      my ($self, $val) = @_;
+      return "" if ! defined $val; # empty string if not defined
+      my %opts = map { %$_ } @{ $self->options };
+      return $opts{$val} || $val;
+    }
+
+y_n_v:
+  type: choice
+  mandatory: 1
+  options:
+    - 1: 'Yes'
+    - 0: 'No'
+  widget: choice_v_altvals
+  class: ynd
+  check: |
+    sub {
+      my ($self, $val) = @_;
+      # options is: [ { 0 => 'No' }, { 1 => 'Yes' } ]
+      my %opts = map { %$_ } @{ $self->options };
+      #  %opts: { 0 => 'No', 1 => 'Yes' }
+      unless ($opts{$val}) { # assume "true" labels
+          die E->new("Not one of allowed responses");
+      }
+      return 1;
+    }
+  perdy_value: |
+    sub {
+      my ($self, $val) = @_;
+      return "" if ! defined $val; # empty string if not defined
+      my %opts = map { %$_ } @{ $self->options };
+      return $opts{$val} || $val;
+    }
+
+
+
+
+
+# yes_no - choice with yes or no
+yes_no:
+  type: choice
+  widget: choice_v
+  options:
+    - Yes
+    - No
+
+
+
+
+#
+# Stubs for larger widgets
+#
+
+# tree - org_tree_expand select type with sane check and options subs
+tree:
+  type: choice
+  widget: org_tree_expand
+  check: |
+    sub {
+       my ($self, $item) = @_;
+       unless($item =~ /^\d+$/ && $item >= 1 && $item <= scalar @{ $self->options } ){
+           die E->new("Not one of allowed responses");
+       }
+       return 1;
+    }
+  options: |
+    sub {
+      my $self = shift;
+      use Data::Rmap qw/:all/;
+      return [ rmap_to {
+        return cut( $_->{text} ) if (ref $_ eq 'HASH');
+        return $_ unless ref $_;
+        return shift->recurse;
+      } HASH|ARRAY|VALUE, @{$self->tree} ];
+    }
+
+
+# ranking - a record slot that handles 'rank the following' type questions
+ranking:
+  type: record
+  mandatory: |
+    sub {
+      my $self = shift;
+      return 1 unless defined $_[0];
+      return ! $self->normalize(@_);
+    }
+  # XXX: normalize is depreciated, but.. currently there is no simple
+  # way to override the check sub to run code after the subslot validation
+  normalize: |
+    sub {
+      my( $self, $val ) = @_;
+      my %val_counts;
+      for my $slt ( @{ $self->columns } ) {
+        next if ! exists $val->{ $slt->name }; # Should this be var_name
+        my $v = $val->{ $slt->name };
+        next if (! defined $v || $v =~ /^\s*$/);
+        if ( $val_counts{$v}++ ) {
+          die E->new("More than one criterion has the same ranking ($v)");
+        }
+      }
+      unless ( scalar keys %val_counts == $self->columns->[0]->max_val ) {
+        die E::Skip->new("You must rank the criterion from ".
+          $self->columns->[0]->min_val." to ".$self->columns->[0]->max_val );
+      }
+      return 1;
+    }
+
+
+# You can add more here
+
+
+phq_scale:
+  type: choice
+  mandatory: 1
+  options:
+    - 0: 'Not at all'
+    - 1: 'Several days'
+    - 2: 'More than half the days'
+    - 3: 'Nearly every day'
+  widget: choice_h_altvals
+  class: ynd
+  check: |
+    sub {
+      my ($self, $val) = @_;
+      # options is: [ { 0 => 'Not at all' }, { 1 => 'Several days' }, { 2 => 'More than half the days' }, { 3 => 'Nearly every day' } ]
+      my %opts = map { %$_ } @{ $self->options };
+      #  %opts: { 0 => 'Not at all', 1 => 'Several days'', 2 => 'More than half the days', 3 => 'Nearly every day' }
+      unless ($opts{$val}) { # assume "true" labels
+          die E->new("Not one of allowed responses");
+      }
+      return 1;
+    }
+  perdy_value: |
+    sub {
+      my ($self, $val) = @_;
+      return "" if ! defined $val; # empty string if not defined
+      my %opts = map { %$_ } @{ $self->options };
+      return $opts{$val} || $val;
+    }
+
+k10_scale:
+  type: choice
+  widget: choice_v
+  mandatory: 1
+  options:
+    - None of the time
+    - A little of the time
+    - Some of the time
+    - Most of the time
+    - All of the time
+
+scale_10_important:
+  type: choice
+  widget: choice_h
+  mandatory: 1
+  options:
+    - '1 Not at all important'
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - '10 Totally important'
+
+scale_10_confident:
+  type: choice
+  widget: choice_h
+  mandatory: 1
+  options:
+    - '1 Not at all confident'
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - '10 Totally confident'
+
+email_check:
+  type: text
+  input_type: email
+  widget: textfield
+  mandatory: 1
+  size: 80
+  check: |
+    sub {
+      my $self = shift;
+
+      if ($self->exists(@_)) {
+        die E->new("Email already exists");
+      }
+      # Normalize
+      my $email = Email::Valid->address( -address => lc $_[0], -mxcheck => 1 );
+      if ( ! $email ) {
+        die E->new( "You must supply a valid email address (not $_[0])" );
+      }
+      $_[0] = $email;
+      return !! $email;
+    }
+
+phone_check:
+  type: int
+  class: consent
+  mandatory: 1
+  min_val: 0
+  max_val: 9999999999
+  size: 20
+#  mandatory: 1
+  check: |
+    sub {
+      my $self = shift;
+      $self->super(@_);
+
+      if ($self->exists(@_)) {
+        die E->new("Phone number already exists");
+      }
+
+      my $val = shift;
+
+      my $area_code = substr($val, 0, 2);
+      # Converting international prefix of 61 to 0
+      my $new_number;
+      if ($area_code == "61") {
+        $new_number = substr($val, 0, 2, "0");
+        $area_code  = substr($val, 0, 2);
+      }
+      my $length = length($val);
+      if ( ($length < 10) || ($length > 10) ) {
+        die E->new( "The mobile phone number supplied is incorrect, must be 10 digits" );
+      }
+      return 1;
+    }
+
+---
+start:
+  nav_actions:
+    parent: 1
+    next: 1
+    show: 1
+  nav:
+    - parent: Clinic use only
+    - next: Next
+  parent: redirect_to_create_new_session
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      if ($session->get('entry') == 1) {
+        return 'PAGE_001';
+      }
+
+      if (!$session->get('out_of_study')) {
+        $session->set(out_of_study => time());
+      }
+
+      return 'PAGE_last_A';
+    }
+  qns:
+    - text: |
+        <p>Our practice is committed to helping you look after your mental health and wellbeing. That's why we are taking part in Link-me: a national trial of a new approach to mental health care.</p>
+        <p class="splashpage-highlight">We invite you to take a 2 minute survey to see if Link-me is right for you.</p>
+      html: 1
+
+
+    - slot:
+        name: entry
+        type: choice
+        mandatory: 1
+        options:
+          - 1: 'Start'
+          - 0: 'No thanks'
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 0 => 'No thanks' }, { 1 => 'Start' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => 'No thanks', 1 => 'Start' }
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+---
+PAGE_001:
+  nav_actions:
+    next: 1
+    prev: 1
+    show: 1
+  nav:
+    - next: Next
+    - prev: Prev
+  parent: redirect_to_default
+  qns:
+
+    - slot:
+        name: screened_past
+        label: Have you filled out this survey before?
+        type: y_n_v
+        mandatory: 1
+
+  switch:
+    var: screened_past
+    cases:
+      1: PAGE_002
+      default: PAGE_003
+
+---
+PAGE_002:
+  next: |
+      sub {
+        my ($page, $session) = @_;
+        if ($session->get('trial_enrolled') == 1) {
+           if (!$session->get('ineligible')) {
+            $session->set(ineligible => time());
+            $session->set(out_of_study => time());
+            $session->set(eligible => undef);
+           }
+
+           return 'PAGE_last_A';
+        } else {
+           return 'PAGE_003';
+        }
+      }
+  qns:
+    - slot:
+        name: trial_enrolled
+        label: Are you currently taking part in Link-me?
+        type: y_n_v
+        madantory: 1
+
+---
+PAGE_003:
+  nav:
+    - first: Home
+    - next: Next
+    - prev: Prev
+  qns:
+
+    - slot:
+        name: age
+        label: "What is your age (in years)?"
+        instructions: Please enter numbers only
+        type: int
+        size: 3
+        mandatory: 1
+
+  next: |
+      sub {
+        my ($page, $session) = @_;
+        my $age = $session->get('age');
+
+        if ( $age < 18 || $age > 75 ) {
+           if (!$session->get('ineligible')) {
+            $session->set(ineligible => time());
+            $session->set(out_of_study => time());
+            $session->set(eligible => undef);
+           }
+           return 'PAGE_last_A';
+        } else {
+           return 'PAGE_004';
+        }
+      }
+
+
+---
+PAGE_004:
+  qns:
+
+    - slot:
+        name: gender
+        label: What is your gender?
+        type: choice
+        mandatory: 1
+        options:
+          - 0: 'Male'
+          - 1: 'Female'
+          - 2: 'Other'
+        widget: choice_v_altvals
+        class: ynd
+        algorithm_vars: |
+          sub {
+            my ($self, $val, $session) = @_;
+            return if $session->get('gender_collapsed');
+
+            # Collapse “other” and “female” into one group for the algorithm
+            my $collapsed_val = $val >= 1 ? 1 : 0;
+            $session->set(gender_collapsed => $collapsed_val);
+          }
+        check: |
+          sub {
+            my ($self, $val, $session) = @_;
+            # options is: [ { 0 => 'Male' }, { 1 => 'Female' }, { 2 => 'Other' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => 'Male', 1 => 'Female', 2 => 'Other'}
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+
+            $self->algorithm_vars($val, $session);
+
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+
+---
+PAGE_004B:
+  qns:
+
+    - slot:
+        name: atsi
+        label: Are you of Aboriginal or Torres Strait Islander origin?
+        type: choice
+        mandatory: 1
+        options:
+          - 0: 'No'
+          - 1: 'Yes, Aboriginal only'
+          - 2: 'Yes, Torres Strait Islander only'
+          - 3: 'Yes, both Aboriginal and Torres Strait Islander'
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 0 => 'No' }, { 1 => 'Yes, Aboriginal only' }, { 2 => 'Yes, Torres Strait Islander only' }, { 3 => 'Yes, both Aboriginal and Torres Strait Islander' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => 'No', 1 => 'Yes, Aboriginal only', 2 => 'Yes, Torres Strait Islander', 3 => 'Yes, both Aboriginal and Torres Strait Islander'}
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+    - slot:
+        name: language
+        label: Which language do you mainly speak at home?
+        type: choice
+        mandatory: 1
+        options:
+          - 0: 'English'
+          - 1: 'Other'
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 0 => 'English' }, { 1 => 'Other' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => 'English', 1 => 'Other'}
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+
+---
+PAGE_005:
+  qns:
+
+    - slot:
+        name: edu
+        label: What is the highest level of education you have completed?
+        type: choice
+        mandatory: 1
+        options:
+          - 0: 'Below Year 10'
+          - 1: 'Year 10'
+          - 2: 'Year 11'
+          - 3: 'Year 12 or equivalent'
+          - 4: 'Certificate III/IV'
+          - 5: 'Advanced Diploma / Diploma'
+          - 6: 'Bachelor Degree'
+          - 7: 'Graduate Diploma / Graduate Certificate'
+          - 8: 'Postgraduate Degree'
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 0 => 'Below Year 10' }, { 1 => 'Year 10' }, { 2 => 'Year 11' }, { 3 => 'Year 12 or equivalent' }, { 4 => 'Certificate III/IV' }, { 5 => 'Advanced Diploma / Diploma' }, { 6 => 'Bachelor Degree' }, { 7 => 'Graduate Diploma / Graduate Certificate' }, { 8 => 'Postgraduate Degree' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => 'Below Year 10', 1 => 'Year 10', 2 => 'Year 11', 3 => 'Year 12 or equivalent', 4 => 'Certificate III/IV', 5 => 'Advanced Diploma / Diploma', 6 => 'Bachelor Degree', 7 => 'Graduate Diploma / Graduate Certificate', 8 => 'Postgraduate Degree'}
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+
+---
+PAGE_005B:
+  qns:
+
+    - slot:
+        name: employment
+        label: "In terms of employment, in a usual week are you:"
+        type: choice
+        mandatory: 1
+        options:
+          - 0: Working for an employer for wages or salary
+          - 1: Working in your own business for profit or pay
+          - 2: 'Working without pay in a family business or on a farm'
+          - 3: 'Unemployed, looking for and available to start work'
+          - 4: None of the above
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 0 => 'Working for an employer for wages or salary' }, { 1 => 'Working in your own business for profit or pay' }, { 2 => 'Working without pay in a family business or on a farm' }, { 3 => 'Unemployed, looking for and available to start work' }, { 4 => 'None of the above' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => 'Working for an employer for wages or salary', 1 => 'Working in your own business for profit or pay', 2 => 'Working without pay in a family business or on a farm', 3 => 'Unemployed, looking for and available to start work', 4 => 'None of the above'}
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+
+  switch:
+    var: employment
+    cases:
+      4: PAGE_005C
+      default: PAGE_005D
+
+---
+PAGE_005C:
+  qns:
+
+    - slot:
+        name: activities
+        label:
+          text: In a usual week, which of the following best describes your <u>main</u> activity?
+          html: 1
+        type: choice
+        mandatory: 1
+        options:
+          - 0: Retired or voluntarily inactive
+          - 1: Home duties
+          - 2: Caring for children
+          - 3: Studying
+          - 4: Unable to work due to own illness, injury, or disability
+          - 5: Caring for an ill or disabled person
+          - 6: Working in an unpaid voluntary job
+          - 7: Other
+        widget: choice_v_altvals
+        class: ynd
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 0 => 'Retired or voluntarily inactive' }, { 1 => 'Home duties' }, { 2 => 'Caring for children ' }, { 3 => 'Studying' }, { 4 => 'Unable to work due to own illness, injury, or disability' }, { 5 => 'Caring for an ill or disabled person' }, { 6 => 'Working in an unpaid voluntary job' }, { 7 => 'Other' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => 'Retired or voluntarily inactive', 1 => 'Home duties', 2 => 'Caring for children ', 3 => 'Studying', 4 => 'Unable to work due to own illness, injury, or disability', 5 => 'Caring for an ill or disabled person', 6 => 'Working in an unpaid voluntary job', 7 => 'Other' }
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+---
+PAGE_005D:
+  qns:
+
+    - slot:
+        name: card
+        label: Do you currently hold an Australian Government Health Care Card or Pensioner Concession Card?
+        type: y_n_v
+        mandatory: 1
+
+---
+PAGE_006:
+# PHQ-9
+  qns:
+
+    - slot:
+        name: phq1
+        label:
+          text: Over the <u><em>last 2 weeks</em></u>, how often have you been bothered by little interest or pleasure in doing things?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: phq2
+        label:
+          text: Over the <u><em>last 2 weeks</em></u>, how often have you been bothered by feeling down, depressed or hopeless?
+          html: 1
+        type: phq_scale
+
+
+---
+PAGE_006B:
+# PHQ-9
+  qns:
+
+    - slot:
+        name: gad1
+        label:
+          text: Over the <u><em>last 2 weeks</em></u>, how often have you been bothered by feeling nervous, anxious, or on edge?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: gad2
+        label:
+          text: Over the <u><em>last 2 weeks</em></u>, how often have you been bothered by not being able to stop or control worrying?
+          html: 1
+        type: phq_scale
+
+
+
+---
+PAGE_007:
+  qns:
+
+    - slot:
+        name: med
+        label: Do you take any medication for your mental health?
+        type: y_n_v
+  next: |
+      sub {
+        my ($page, $session) = @_;
+        my $anxiety    = $session->get('gad1') + $session->get('gad2');
+        my $depression = $session->get('phq1') + $session->get('phq2');
+
+        my $limit = 2;
+
+        my $timestamp = time();
+
+        if (!$session->get('screening_complete')) {
+          $session->set(screening_complete => $timestamp);
+        }
+
+        if ($session->get('med') == 0 && $anxiety < $limit && $depression < $limit) {
+          if (!$session->get('ineligible')) {
+            $session->set(ineligible => $timestamp);
+            $session->set(out_of_study => time());
+            $session->set(eligible => undef);
+          }
+          return 'PAGE_last_A';
+        }
+
+        if (!$session->get('eligible')) {
+          $session->set(eligible => $timestamp);
+          $session->set(ineligible => undef);
+          $session->set(out_of_study => undef);
+        }
+
+        return 'PAGE_invite_participate_1';
+      }
+
+---
+PAGE_invite_participate_1:
+  nav:
+    - first: Home
+    - next: Next
+    - prev: Prev
+  qns:
+
+    - text: |
+          <p>Based on your answers we invite you to take part in Link-me.</p>
+          <p>Link-me is a <strong>[% INCLUDE glossary_link.tt2 term='randomised controlled trial' text='randomised controlled trial' %]</strong> testing a new approach to mental health care. It is funded by the Australian Government and is led by researchers at the University of Melbourne.</p>
+      tt2: 1
+
+
+---
+PAGE_invite_participate_2:
+  nav:
+    - first: Home
+    - next: Next
+    - prev: Prev
+  qns:
+
+    - text: |
+        <p>One in two Australians will experience mental health problems in their lifetime.</p>
+        <p>Mental health problems can make it hard for people to live the life they want.</p>
+        <p>Many things can help improve mental health, but it can be hard to know what is the best option for you.</p>
+        <p>Link-me is testing whether a survey that's completed in the GP waiting room can help people improve their mental health by finding support that works for them.</p>
+      html: 1
+
+
+---
+PAGE_invite_participate_3:
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      if ($session->get('interested') == 1) {
+        return 'consent';
+      }
+
+      if (!$session->get('out_of_study')) {
+        $session->set(out_of_study => time());
+      }
+
+      return 'PAGE_last_A';
+    }
+  qns:
+
+
+    - text: |
+        Taking part in Link-me is completely up to you, and you can withdraw (quit) at any time. If you take part we will ask you to:
+        <p><ul>
+          <li>Fill out a short (2-5 minute) survey on this iPad. Depending on your answers you may be randomly allocated to one of two groups. Each group will be asked to do something different.</li>
+          <li>Provide your contact details so that we can contact you for feedback about your mental health and mental health care in 6, 12, and 18 months.</li>
+        </ul></p>
+        <p>You can read more about Link-me by tapping the buttons below. You can also collect a more detailed information booklet from reception.</p>
+      html: 1
+
+    - text: |
+        <div class="infobox"><strong>[% INCLUDE glossary_link.tt2 term='What are the benefits and risks of taking part?' text='What are the benefits and risks of taking part?' %]</strong></div>
+      tt2: 1
+
+    - text: |
+        <div class="infobox"><strong>[% INCLUDE glossary_link.tt2 term='What will happen to information about me?' text='What will happen to information about me?' %]</strong></div>
+      tt2: 1
+
+    - text: |
+        <div class="infobox"><strong>[% INCLUDE glossary_link.tt2 term='Link-me and my GP' text='Link-me and my GP' %]</strong></div>
+      tt2: 1
+
+    - text: |
+        <div class="infobox"><strong>[% INCLUDE glossary_link.tt2 term='Link-me and my health service use' text='Link-me and my health service use' %]</strong></div>
+      tt2: 1
+
+    - text: |
+        <div class="infobox"><strong>[% INCLUDE glossary_link.tt2 term='Who can I contact about this trial?' text='Who can I contact about this trial?' %]</strong></div>
+      tt2: 1
+
+
+    - slot:
+        name: interested
+        type: choice
+        mandatory: 1
+        options:
+          - 1: "I'd like to get started with Link-me"
+          - 0: "No thanks, I'll stop here"
+        widget: choice_v_altvals
+        class: ynd whitehighlight
+        check: |
+          sub {
+            my ($self, $val) = @_;
+            # options is: [ { 0 => "No thanks, I'll stop here" }, { 1 => "I'd like to get started with Link-me" } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => "No thanks, I'll stop here", 1 => "I'd like to get started with Link-me" }
+            unless ($opts{$val}) { # assume "true" labels
+                die E->new("Not one of allowed responses");
+            }
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+
+
+---
+consent:
+  nav:
+    - first: Home
+    - next: Submit
+    - prev: Prev
+
+  next: |
+    sub {
+      # use Data::Dumper;
+
+      my ($page, $session) = @_;
+
+      my $conf = SD::Config->load;
+      my $json = JSON::XS->new;
+
+      # Validate duplicate registrations
+      my $duplicate_sessions = $conf->{get_sessions_where}->('survey', {
+        email => $session->get('email'),
+      	dob   => $session->get('dob'),
+      });
+
+      # check that there is only 1 element in the array
+      if (@$duplicate_sessions > 1) {
+        return 'PAGE_last_B';
+        # die E->new("The email address and date of birth have already been registered with Link-me.");
+      }
+
+
+      if (!$session->get('consent_email_sent')) {
+        my $base_url    = $conf->{webserver_info}->{fe_url};
+        my $session_key = $session->get('session_key');
+
+        my $vars = {
+          name => $session->get('firstname'),
+          link => "$base_url/q?SD_KEY=$session_key",
+        };
+
+        $conf->{send_email}->(
+          $session->get('email'),
+          undef,
+          'Link-me - Survey link',
+          'link_me_survey_link.tx',
+          $json->encode($vars),
+          undef,
+        );
+
+        $session->set(consent_email_sent => time());
+        $session->set(started            => time());
+      }
+
+      return 'survey_start';
+    }
+
+  qns:
+
+    - text: |
+        Getting started with Link-me is easy. Just enter your details below to show that you:
+        <p><ul>
+          <li>agree to take part in Link-me as described </li>
+          <li>agree to us updating your medical record with information relevant to your mental health care (if necessary)</li>
+          <li>agree to be emailed a copy of the study information</li>
+          <li>have had a chance to read the study information and have asked practice staff any questions you may have</li>
+          <li>understand that you can withdraw from the trial at any time.</li>
+        </ul></p>
+      html: 1
+
+    - slot:
+        name: firstname
+        label:
+          text: First name
+          position: aligned
+        type: text
+        size: 40
+        mandatory: 1
+
+    - slot:
+        name: surname
+        label:
+          text: Surname
+          position: aligned
+        type: text
+        size: 40
+        mandatory: 1
+
+    - slot:
+        name: dob
+        class: dobfield
+        label:
+          text: Date of birth
+          position: aligned
+        type: date
+        picker: none
+        mandatory: 1
+
+    - slot:
+        name: email
+        label:
+          text: Email
+          position: aligned
+        type: email_check
+        size: 40
+        mandatory: 1
+
+    - slot:
+        name: phone
+        label:
+          text: Mobile
+          position: aligned
+        type: phone_check
+        size: 20
+        mandatory: 1
+
+    - slot:
+        name: address
+        class: mail-address
+        label:
+          text: Mail address
+          position: aligned
+        type: textarea
+        rows: 3
+        cols: 40
+
+
+
+---
+survey_start:
+  nav:
+    - first: Home
+    - next: Start
+    - prev: Prev
+
+  qns:
+    - heading: Let's get started!
+    - text: |
+        <p>There are no right or wrong answers to these questions. If you're not sure which answer to give, the first one you think of is often the best.</p>
+        <p>Please answer all the questions, even if some seem very similar to each other.</p>
+
+      tt2: 1
+
+
+---
+PAGE_008:
+  nav:
+    - first: Home
+    - next: Next
+    - prev: Prev
+  qns:
+
+    - slot:
+        name: gp
+        label: Which doctor are you seeing today?
+        type: select
+        widget: gp_select
+        other_text: Other
+        mandatory: 1
+        check: |
+          sub {
+            my ($self, $item, $session) = @_;
+            return 1 if ( $self->open );
+            # $item must be a valid key to the option_keys hash
+            my $config         = SD::Config->load;
+            my $gps            = $config->{gps};
+
+            my $phn      = $session->get('phn');
+            my $practice = $session->get('practice');
+
+            my $gp_list = $gps ? $gps->{$phn}{$practice} : undef;
+
+            my @options = (
+              $self->other_text,
+              "I'm not sure",
+            );
+
+            my %keys = map { $_ => 1 } (@options, @$gp_list);
+
+            die E->new("Not one of the allowed responses") unless exists $keys{$item};
+
+            return 1;
+          }
+
+    - slot:
+        name: gp_other
+        class: not-bold
+        label: "If other, please specify your doctor name:"
+        type: text
+        size: 60
+        mandatory: |
+          sub {
+            my ($self, $value, $session) = @_;
+            if ($session->get('gp') eq 'Other') {
+              return 1;
+            }
+            return 0;
+          }
+
+    - slot:
+        name: gp_reason
+        label: "Is your visit to the doctor today mainly related to your:"
+        type: c_v
+        mandatory: 1
+        options:
+          - Physical health
+          - Mental health and wellbeing
+          - Both physical and mental health
+          - None of these
+
+
+---
+PAGE_008B:
+  qns:
+    - slot:
+        name: sf1_health
+        label: "In general, would you say your health is:"
+        type: c_v
+        mandatory: 1
+        options:
+          - Excellent
+          - Very good
+          - Good
+          - Fair
+          - Poor
+        algorithm_vars: |
+          sub {
+            my ($self, $val, $session) = @_;
+
+            return if $session->get('sf1_health_collapse');
+
+            my $collapsed_val = $val;
+
+            if ($val <= 3) {
+              $collapsed_val = 0;
+            }
+
+            $session->set(sf1_health_collapse => $collapsed_val);
+          }
+        check: |
+          sub {
+            my $self = shift;
+
+            $self->super(@_);
+            $self->algorithm_vars(@_);
+
+            return 1;
+          }
+
+
+    - slot:
+        name: chronic
+        label: Do you have any long-term illness or health problem, which limits your daily activities or the work you can do (including problems that are due to old age)?
+        type: y_n_v
+
+
+---
+PAGE_008C:
+  qns:
+
+    - slot:
+        name: live_alone
+        label: Do you live alone?
+        type: y_n_v
+
+    - slot:
+        name: inc_mg
+        label: How do you manage on your available income?
+        type: c_v
+        mandatory: 1
+        options:
+          - Easily
+          - Not too bad
+          - Difficult some of the time
+          - Difficult all of the time
+          - Impossible
+        algorithm_vars: |
+          sub {
+            my ($self, $val, $session) = @_;
+
+            return if $session->get('inc_mg_collapse');
+
+            my $collapsed_val;
+
+            if ($val <= 3) {
+              $collapsed_val = 0;
+            } elsif ($val > 3) {
+              $collapsed_val = 1;
+            }
+
+            $session->set(inc_mg_collapse => $collapsed_val);
+          }
+        check: |
+          sub {
+            my $self = shift;
+
+            $self->super(@_);
+            $self->algorithm_vars(@_);
+
+            return 1;
+          }
+
+
+---
+PAGE_009:
+  qns:
+
+    - slot:
+        name: phq3
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by trouble falling or staying asleep, or sleeping too much?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: phq4
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by feeling tired or having little energy?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: phq5
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by poor appetite or overeating?
+          html: 1
+        type: phq_scale
+
+
+---
+PAGE_009B:
+  qns:
+    - slot:
+        name: phq6
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by feeling bad about yourself - or that you are a failure or have let yourself or your family down?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: phq7
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by trouble concentrating on things, such as reading the newspaper or watching television?
+          html: 1
+        type: phq_scale
+
+---
+PAGE_009C:
+  qns:
+
+    - slot:
+        name: phq8
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by moving or speaking so slowly that other people could have noticed? Or the opposite - being so fidgety or restless that you have been moving around a lot more than usual?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: phq9
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by thoughts that you would be better off dead or of hurting yourself in some way?
+          html: 1
+        type: phq_scale
+        algorithm_vars: |
+          sub {
+            my ($self, $val, $session) = @_;
+
+            return if $session->get('phqdep_total');
+
+            my $qn_prefix = "phq";
+
+            # Current question answer is default total
+            my $total     = $val;
+            for my $x ( 1 .. 8 ) {
+              my $val = $session->get("${qn_prefix}${x}");
+              $total += $val;
+            }
+
+            $session->set(phqdep_total => $total);
+          }
+        check: |
+          sub {
+            my $self = shift;
+
+            $self->super(@_);
+            $self->algorithm_vars(@_);
+
+            return 1;
+          }
+
+
+
+---
+PAGE_010:
+  qns:
+
+    - slot:
+        name: ever_down
+        label:
+          text: Have you <u>ever</u> been bothered by feeling down, depressed or hopeless for longer than 2 weeks?
+          html: 1
+        type: y_n_v
+
+    - slot:
+        name: ever_nointerest
+        label:
+          text: Have you <u>ever</u> been bothered by little interest or pleasure in doing things for longer than 2 weeks?
+          html: 1
+        type: y_n_v
+        algorithm_vars: |
+          sub {
+            my ($self, $val, $session) = @_;
+
+            return if $session->get('ever_depressed');
+
+            if ($val && $session->get('ever_down')) {
+              $session->set(ever_depressed => 1);
+            } else {
+              $session->set(ever_depressed => 0);
+            }
+          }
+        check: |
+          sub {
+            my $self = shift;
+
+            $self->super(@_);
+            $self->algorithm_vars(@_);
+
+            return 1;
+          }
+
+
+---
+PAGE_011:
+  qns:
+
+    - slot:
+        name: gad3
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by worrying too much about different things?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: gad4
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by trouble relaxing?
+          html: 1
+        type: phq_scale
+
+
+---
+PAGE_011B:
+  qns:
+
+
+    - slot:
+        name: gad5
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by being so restless that it is hard to sit still?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: gad6
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by becoming easily annoyed or irritable?
+          html: 1
+        type: phq_scale
+
+
+---
+PAGE_011C:
+  qns:
+
+
+    - slot:
+        name: gad7
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by feeling afraid as if something awful might happen?
+          html: 1
+        type: phq_scale
+        algorithm_vars: |
+          sub {
+            my ($self, $val, $session) = @_;
+
+            return if $session->get('gad_max');
+
+            my $qn_prefix = "gad";
+            # This slots value is total default
+            my $total     = $val;
+            for my $x ( 1 .. 6 ) {
+              my $val = $session->get("${qn_prefix}${x}");
+              $total += $val;
+            }
+
+            $session->set(gad_total => $total);
+
+            my $gad1 = $session->get('gad1');
+            my $gad2 = $session->get('gad2');
+
+            my $gad1r = $gad1 >= 2 ? 2 : $gad1;
+            my $gad2r = $gad2 >= 2 ? 2 : $gad2;
+
+            $session->set(gad1r => $gad1r);
+            $session->set(gad2r => $gad2r);
+
+            my $gad_max = $gad1r > $gad2r ? $gad1r : $gad2r;
+            $session->set(gad_max => $gad_max);
+          }
+        check: |
+          sub {
+            my $self = shift;
+
+            $self->super(@_);
+            $self->algorithm_vars(@_);
+
+            return 1;
+          }
+
+---
+PAGE_012:
+  qns:
+
+    - text: |
+        <p>Tap the response that best describes your health <strong>today</strong>.</p>
+      html: 1
+
+    - slot:
+        name: eq1
+        label: MOBILITY
+        type: c_v
+        options:
+          - I have no problems in walking about
+          - I have slight problems in walking about
+          - I have moderate problems in walking about
+          - I have severe problems in walking about
+          - I am unable to walk about
+
+    - slot:
+        name: eq2
+        label: SELF-CARE
+        type: c_v
+        options:
+          - I have no problems washing or dressing myself
+          - I have slight problems washing or dressing myself
+          - I have moderate problems washing or dressing myself
+          - I have severe problems washing or dressing myself
+          - I am unable to wash or dress myself
+
+---
+PAGE_012B:
+  qns:
+
+    - text: |
+        <p>Tap the response that best describes your health <strong>today</strong>.</p>
+      html: 1
+
+    - slot:
+        name: eq3
+        label:  USUAL ACTIVITIES (e.g., work, study, housework, family, or leisure activities)
+        type: c_v
+        options:
+          - I have no problems doing my usual activities
+          - I have slight problems doing my usual activities
+          - I have moderate problems doing my usual activities
+          - I have severe problems doing my usual activities
+          - I am unable to do my usual activities
+
+
+---
+PAGE_012C:
+  qns:
+
+    - text: |
+        <p>Tap the response that best describes your health <strong>today</strong>.</p>
+      html: 1
+
+    - slot:
+        name: eq4
+        label: PAIN / DISCOMFORT
+        type: c_v
+        options:
+          - I have no pain or discomfort
+          - I have slight pain or discomfort
+          - I have moderate pain or discomfort
+          - I have severe pain or discomfort
+          - I have extreme pain or discomfort
+
+
+    - slot:
+        name: eq5
+        label: ANXIETY / DEPRESSION
+        type: c_v
+        options:
+          - I am not anxious or depressed
+          - I am slightly anxious or depressed
+          - I am moderately anxious or depressed
+          - I am severely anxious or depressed
+          - I am extremely anxious or depressed
+
+
+
+---
+PAGE_013:
+  qns:
+
+
+    - slot:
+        type: text
+        name: healthrange
+        widget: range
+    - slot:
+        name: eq_vas
+        label:
+          text: |
+            <p>We would like to know how good or bad your health is <u><em>today</em></u>.<br/>
+              This scale is numbered from 0 to 100.<br/>
+              100 means the <u><em>best</em></u> health you can imagine<br/>
+              0 means the <u><em>worst</em></u> health you can imagine.<br/>
+              Please click on the scale to indicate how your health is <u><em>today</em></u>.</p>
+              <h1 id="range-value"></h1>
+          html: 1
+        type: c_v
+
+
+---
+PAGE_014:
+  qns:
+
+    - slot:
+        name: k1
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel tired out for no good reason?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k2
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel nervous?
+          html: 1
+        type: k10_scale
+
+
+---
+PAGE_014B:
+  qns:
+
+    - slot:
+        name: k3
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel so nervous that nothing could calm you down?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k4
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel hopeless?
+          html: 1
+        type: k10_scale
+
+---
+PAGE_014C:
+  qns:
+
+    - slot:
+        name: k5
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel restless or fidgety?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k6
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel so restless you could not sit still?
+          html: 1
+        type: k10_scale
+
+---
+PAGE_015:
+  qns:
+
+    - slot:
+        name: k7
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel depressed?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k8
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel that everything was an effort?
+          html: 1
+        type: k10_scale
+
+---
+PAGE_015B:
+  qns:
+
+    - slot:
+        name: k9
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel so sad that nothing could cheer you up?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k10
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel worthless?
+          html: 1
+        type: k10_scale
+
+  next: |
+      sub {
+        my ($page, $session) = @_;
+        my $k1 = $session->get('k1');
+        my $k2 = $session->get('k2');
+        my $k3 = $session->get('k3');
+        my $k4 = $session->get('k4');
+        my $k5 = $session->get('k5');
+        my $k6 = $session->get('k6');
+        my $k7 = $session->get('k7');
+        my $k8 = $session->get('k8');
+        my $k9 = $session->get('k9');
+        my $k10 = $session->get('k10');
+
+        if ( $k1 == 1 && $k2 == 1 && $k3 == 1 && $k4 == 1 && $k5 == 1 && $k6 == 1 && $k7 == 1 && $k8 == 1 && $k9 == 1 && $k10 == 1 ) {
+            # Calculate the things
+            my $conf = SD::Config->load;
+
+            my $group = $session->get('group');
+
+            if (!$session->get('severity')) {
+              my $severity_level = $conf->{calculate_severity}->($session);
+              $session->set(severity => $severity_level);
+
+              # Moderate is *always* control.
+              if ($severity_level =~ m/^Moderate/) {
+                $group = 'control';
+                $session->set(group => 'control');
+              }
+
+              if (!$group) { # Randomize Mild/Severe severity groups
+                $group = $conf->{get_group}->($session);
+                $session->set(group => $group);
+              }
+            }
+
+            my $ok_areas = $conf->{get_ok_areas}->($session);
+            if ($group eq 'intervention') {
+              if (@$ok_areas == 0) {
+                return 'PAGE_intervention_3';
+              } else {
+                return 'PAGE_intervention_1';
+              }
+            } else {
+              return 'PAGE_control_last';
+            }
+        } else {
+           return 'PAGE_016';
+        }
+      }
+
+
+
+---
+PAGE_016:
+  nav:
+    - first: Home
+    - next: Next
+    - prev: Prev
+  qns:
+
+    - slot:
+        name: k11
+        label:
+          text: In the <u><em>last four weeks</em></u>, how many days were you <u>totally unable</u> to work, study, or manage your day to day activities because of these feelings?
+          html: 1
+        type: int
+        size: 4
+        instructions: Please enter numbers only
+        mandatory: 1
+        max_val: 28
+
+    - slot:
+        name: k12
+        label:
+          text: Aside from those days, in the <u><em>last four weeks</em></u>, how many days were you able to work, study, or manage your day to day activities, but had to <u>cut down</u> on what you did because of these feelings?
+          html: 1
+        type: int
+        size: 4
+        instructions: Please enter numbers only
+        mandatory: 1
+        max_val: 28
+
+---
+PAGE_016B:
+  nav:
+    - first: Home
+    - next: Next
+    - prev: Prev
+  qns:
+
+    - slot:
+        name: k13
+        label:
+          text: In the <u><em>last four weeks</em></u>, how many times have you seen a doctor or any other health professional about these feelings?
+          html: 1
+        type: int
+        size: 4
+        mandatory: 1
+        instructions: Please enter numbers only
+
+    - slot:
+        name: k14
+        label:
+          text: In the <u><em>last four weeks</em></u>, how often have physical health problems been the main cause of these feelings?
+          html: 1
+        type: k10_scale
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $conf = SD::Config->load;
+
+      my $group = $session->get('group');
+
+      if (!$session->get('severity')) {
+        my $severity_level = $conf->{calculate_severity}->($session);
+        $session->set(severity => $severity_level);
+
+        # Moderate is *always* control.
+        if ($severity_level =~ m/^Moderate/) {
+          $group = 'control';
+          $session->set(group => 'control');
+        }
+
+        if (!$group) {
+          $group = $conf->{get_group}->($session);
+          $session->set(group => $group);
+        }
+      }
+
+      my $ok_areas = $conf->{get_ok_areas}->($session);
+      if ($group eq 'intervention') {
+        if (@$ok_areas == 0) {
+          return 'PAGE_intervention_3';
+        } else {
+          return 'PAGE_intervention_1';
+        }
+      } else {
+        return 'PAGE_control_last';
+      }
+    }
+
+---
+PAGE_intervention_1:
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $conf = SD::Config->load;
+      my $difficult_areas = $conf->{get_difficult_areas}->($session);
+
+      my $severity = $session->get('severity');
+
+      if (@$difficult_areas == 0) {
+        if ($severity =~ m/^Mild/) {
+          return 'PAGE_intervention_low';
+        } else {
+          return 'PAGE_intervention_high';
+        }
+      } else {
+        return 'PAGE_intervention_3';
+      }
+    }
+  qns:
+    - text: |
+        <p>Thank you for completing the Link-me survey!</p>
+        <p>Your GP is here to help you with any concerns you may have about your mental health. We will also send you an email with some other services that are available 24 hours a day.</p>
+        <p>From what you have told us, things seem to be ok for you in these areas right now:</p>
+      html: 1
+
+
+    - text: "[% PROCESS intervention_ok_areas %]"
+      tt2: 1
+
+
+---
+PAGE_intervention_3:
+  qns:
+    - text: "[% PROCESS intervention_difficult_areas %]"
+      tt2: 1
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $conf = SD::Config->load;
+      my $difficult_areas = $conf->{get_difficult_areas}->($session);
+
+      my $severity = $session->get('severity');
+
+      if (@$difficult_areas <= 2) {
+        return 'PAGE_intervention_5';
+      } else {
+        return 'PAGE_intervention_4';
+      }
+    }
+
+---
+PAGE_intervention_4:
+  qns:
+
+    - text: |
+          <h1 align="center">Areas of difficulty</h1>
+          <p>It looks like there are a few areas that are difficult for you at the moment. No one can do everything at once, so why not pick one or two of these areas to focus on first. Once you feel like these areas of your life are more in control, you can choose something else to focus on.</p>
+      tt2: 1
+
+    - slot:
+        name: q2
+        type: mc_v
+        widget: choice_v_altvals
+        min_responses: 1
+        max_responses: 2
+        label: You can only select up to two areas of difficulty
+        difficult_areas: 1
+        options:
+           - interest: Little interest
+           - mood: Mood
+           - sleep: Sleep
+           - energy: Energy
+           - appetite: Appetite
+           - image: Self-image
+           - concentration: Concentration
+           - movement: Movement
+           - death: Thought of death
+           - anxiety: Anxiety
+           - health: Health
+           - activities: Daily activities
+           - economy: Finances
+        check: |
+          sub {
+            my ($self, $val, $session) = @_;
+            my $total_selected  = @{$val};
+            if ($total_selected < $self->min_responses ) {
+             die E::Skip->new("Please select at least one area of difficulty");
+             return 0;
+            } elsif ($total_selected > $self->max_responses) {
+              die E::Skip->new("You can only select up to two areas of difficulty");
+              return 0;
+            }
+            # options is: [ { 0 => 'Male' }, { 1 => 'Female' }, { 2 => 'Other' } ]
+            my %opts = map { %$_ } @{ $self->options };
+            #  %opts: { 0 => 'Male', 1 => 'Female', 2 => 'Other'}
+            unless ($opts{$val}) { # assume "true" labels
+            # die E->new("Not one of allowed responses");
+            }
+
+            return 1;
+          }
+        perdy_value: |
+          sub {
+            my ($self, $val) = @_;
+            return "" if ! defined $val; # empty string if not defined
+            my %opts = map { %$_ } @{ $self->options };
+            return $opts{$val} || $val;
+          }
+
+
+---
+PAGE_intervention_5:
+  qns:
+
+    - text: |
+        [%- INCLUDE difficult_areas_scale_text -%]
+      tt2: 1
+
+    - slot:
+        class: single-line
+        name: motivation
+        label: How important is it for you to make some changes in these areas, on a scale from 1 to 10?
+        type: scale_10_important
+        mandatory: 1
+
+    - slot:
+        class: single-line
+        name: confidence
+        label: How confident are you about making changes in these areas, on a scale from 1 to 10?
+        type: scale_10_confident
+        mandatory: 1
+
+
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $conf = SD::Config->load;
+
+      my $severity_level = $session->get('severity');
+
+      if ($severity_level eq 'Mild_D' || $severity_level eq 'Mild_A' || $severity_level eq 'Mild_DA') {
+        return 'PAGE_intervention_low';
+      } elsif ($severity_level eq 'Severe_D' || $severity_level eq 'Severe_A' || $severity_level eq 'Severe_DA') {
+        return 'PAGE_intervention_high';
+      } else {
+        return 'PAGE_control_last';
+      }
+    }
+
+---
+PAGE_intervention_low:
+  nav:
+#    - first: Home
+    - next: Next
+#    - prev: Prev
+  next: PAGE_last_A
+  qns:
+
+    - text: |
+        [%- INCLUDE difficult_areas_text -%]
+        <p>When you are ready, please click 'Next' and we will send you an email with a link to find out more about these options and decide which one might be right for you. You might also like to discuss these options with your GP.</p>
+      tt2: 1
+    - text: "[% PROCESS resources %]"
+      tt2: 1
+
+
+
+---
+PAGE_intervention_high:
+  nav:
+#    - first: Home
+    - next: Next
+#    - prev: Prev
+  next: PAGE_last_A
+  qns:
+
+    - text: |
+        <input type="hidden" id="anxiety_predict" name="anxiety_predict" value="[% session.get('anxiety_predict') %]" />
+        <input type="hidden" id="depression_predict" name="depression_predict" value="[% session.get('depression_predict') %]" />
+        <p>To help with your [%- INCLUDE difficult_areas -%], we think you might benefit from working together with the Link-me navigator and your GP.</p>
+        <p>The Link-me navigator is a health professional who is specially trained to work closely with you and your GP to help you identify and access the right support to keep you well.</p>
+        <p>As part of Link-me you're invited to have up to eight free appointments with the Link-me navigator to find an approach to mental health care that works for you.</p>
+        <p>The Link-me navigator will give you a call in the next couple of days to talk more about this service and to schedule your first appointment. </p>
+      tt2: 1
+
+
+
+---
+PAGE_control_last:
+  nav:
+#    - first: Home
+    - next: Finish
+#    - prev: Prev
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $config = SD::Config->load;
+
+      $config->{send_completion_email}->($session);
+
+      # Don't store difficult areas as control.
+      # As Susie doesn't want them on admin site.
+      # $config->{store_list_difficult}->($session);
+
+      $session->set(completed => time());
+      return 'completed';
+    }
+  qns:
+
+    - text: |
+        <input type="hidden" id="anxiety_predict" name="anxiety_predict" value="[% session.get('anxiety_predict') %]" />
+        <input type="hidden" id="depression_predict" name="depression_predict" value="[% session.get('depression_predict') %]" />
+        <p>Thank you for completing the Link-me survey!</p>
+        <p>Your GP is here to help you with any concerns you may have about your mental health. We will also send you an email with some other services that are available 24 hours a day.</p>
+        <p>Link-me is your chance to have a say in how mental health care is delivered in Australia. We will check in with you in about six months' time to ask about your experience of mental health care in your area.</p>
+        <p>In the meantime, if you have any questions please contact us - you can find our details at reception or on the email we have sent you.</p>
+        <p><strong>Please return this iPad to reception.</strong></p>
+      tt2: 1
+
+---
+PAGE_last_A:
+  nav:
+#    - first: Home
+    - next: Finish
+#    - prev: Prev
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $config     = SD::Config->load;
+      my $send_email = !($session->get('ineligible') || $session->get('out_of_study'));
+
+      if ($send_email) {
+        $config->{send_completion_email}->($session);
+        $config->{store_list_difficult}->($session);
+      }
+
+      $session->set(completed => time());
+      return 'completed';
+    }
+  qns:
+
+    - text: |
+        <input type="hidden" id="anxiety_predict" name="anxiety_predict" value="[% session.get('anxiety_predict') %]" />
+        <input type="hidden" id="depression_predict" name="depression_predict" value="[% session.get('depression_predict') %]" />
+        <p>Thank you for your time today.</p>
+        <p>Your answers will help us to improve care for mental health and wellbeing in Australia.</p>
+        <p><strong>Please return this iPad to reception.</strong></p>
+        <p>Link-me is a collaboration between the University of Melbourne and the Brisbane North, North Coast, and North Western Melbourne Primary Health Networks. The trial is funded by the Australian Government Department of Health.</p>
+        <p>If you have any questions about the study, please contact us at <a href="mailto:link-me@unimelb.edu.au">link-me@unimelb.edu.au</a>.</p>
+      tt2: 1
+
+---
+PAGE_last_B:
+  nav:
+#    - first: Home
+    - next: Finish
+#    - prev: Prev
+  next: |
+    sub {
+      my ($page, $session) = @_;
+
+      my $conf = SD::Config->load;
+      my $json = JSON::XS->new;
+
+      my $vars = {
+        name => $session->get('firstname'),
+      };
+
+      $conf->{send_email}->(
+        $session->get('email'),
+        undef,
+        'Thanks for your interest in Link-me',
+        'link_me_already_completed.tx',
+        $json->encode($vars),
+        undef,
+      );
+
+      $session->set(completed => time());
+      return 'completed';
+    }
+
+  qns:
+
+    - text: |
+        <p>Thanks for your interest in Link-me. Based on the information you've provided it looks like you're already registered for the trial. If you think this is a mistake, please contact us using the details we have just sent you via email.</p>
+        <p><strong>Please return this iPad to reception.</strong></p>
+        <p>Link-me is a collaboration between the University of Melbourne and the Brisbane North, North Coast, and North Western Melbourne Primary Health Networks. The trial is funded by the Australian Government Department of Health.</p>
+        <p>If you have any questions about the study, please contact us at <a href="mailto:link-me@unimelb.edu.au">link-me@unimelb.edu.au</a>.</p>
+      html: 1
+
+
+# Last page is not used!
+---
+last:
+  nav:
+    - first: Start
+    - next: Submit
+    - prev: Prev
+  next: |
+    sub {
+      my ($page, $session) = @_;
+      $session->set(completed => time());
+      return 'completed';
+    }
+  percent: 99
+  qns:
+    - text: "[% PROCESS last %]"
+      tt2: 1
+
+---
+redirect_to_default:
+  template: redirect_to_default
+
+---
+redirect_to_create_new_session:
+  template: redirect_to_create_new_session

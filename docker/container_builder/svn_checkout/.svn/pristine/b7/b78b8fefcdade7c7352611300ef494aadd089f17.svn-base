@@ -1,0 +1,1694 @@
+# Prototypes
+c_v:
+  type: choice
+  widget: choice_v
+
+c_h:
+  type: choice
+  widget: choice_h
+
+mc_v:
+  type: multichoice
+  widget: choice_v
+
+mc_h:
+  type: multichoice
+  widget: choice_h
+
+# db_upload - upload slot that stores data in our database
+db_upload:
+  type: upload
+  store_class: 'SD::Slot::Upload::Store::Database'
+
+# datepicker - date slot with jQuery datepicker
+datepicker:
+  type: date
+  widget: datepicker
+  class: datepicker
+
+#
+# Often used
+#
+
+
+
+
+custom_value:
+  type: c_v
+  widget: custom_value_select
+  option_keys: |
+    sub {
+      my $self = shift;
+      # XXX: Use a preprocessor to pre-calculate and store this result
+      my $ctr = 0;
+      return { map { $_->[0] => $ctr++ } @{ $self->options } }
+    }
+  check: |
+    sub {
+      my ( $self, $item ) = @_;
+      return 1 if ( $self->open );
+      # $item must be a valid key to the option_keys hash
+      my $keys = $self->option_keys;
+      die E->new("Not one of the allowed responses") unless exists $keys->{$item};
+      return 1;
+    }
+  pretty_value: |
+    sub {
+      my ( $self, $val ) = @_;
+      my $keys = $self->option_keys;
+      return $self->options->[ $keys->{$val} ]->[1];
+    }
+
+y_n:
+  type: choice
+  options:
+    - 1: 'Yes'
+    - 0: 'No'
+  widget: choice_h_altvals
+  class: ynd
+  check: |
+    sub {
+      my ($self, $val) = @_;
+      # options is: [ { 0 => 'No' }, { 1 => 'Yes' } ]
+      my %opts = map { %$_ } @{ $self->options };
+      #  %opts: { 0 => 'No', 1 => 'Yes' }
+      unless ($opts{$val}) { # assume "true" labels
+          die E->new("Not one of allowed responses");
+      }
+      return 1;
+    }
+  perdy_value: |
+    sub {
+      my ($self, $val) = @_;
+      return "" if ! defined $val; # empty string if not defined
+      my %opts = map { %$_ } @{ $self->options };
+      return $opts{$val} || $val;
+    }
+
+y_n_v:
+  type: choice
+  options:
+    - 1: 'Yes'
+    - 0: 'No'
+  widget: choice_v_altvals
+  class: ynd
+  check: |
+    sub {
+      my ($self, $val) = @_;
+      # options is: [ { 0 => 'No' }, { 1 => 'Yes' } ]
+      my %opts = map { %$_ } @{ $self->options };
+      #  %opts: { 0 => 'No', 1 => 'Yes' }
+      unless ($opts{$val}) { # assume "true" labels
+          die E->new("Not one of allowed responses");
+      }
+      return 1;
+    }
+  perdy_value: |
+    sub {
+      my ($self, $val) = @_;
+      return "" if ! defined $val; # empty string if not defined
+      my %opts = map { %$_ } @{ $self->options };
+      return $opts{$val} || $val;
+    }
+
+
+
+
+
+# yes_no - choice with yes or no
+yes_no:
+  type: choice
+  widget: choice_v
+  options:
+    - Yes
+    - No
+
+
+
+
+#
+# Stubs for larger widgets
+#
+
+# tree - org_tree_expand select type with sane check and options subs
+tree:
+  type: choice
+  widget: org_tree_expand
+  check: |
+    sub {
+       my ($self, $item) = @_;
+       unless($item =~ /^\d+$/ && $item >= 1 && $item <= scalar @{ $self->options } ){
+           die E->new("Not one of allowed responses");
+       }
+       return 1;
+    }
+  options: |
+    sub {
+      my $self = shift;
+      use Data::Rmap qw/:all/;
+      return [ rmap_to {
+        return cut( $_->{text} ) if (ref $_ eq 'HASH');
+        return $_ unless ref $_;
+        return shift->recurse;
+      } HASH|ARRAY|VALUE, @{$self->tree} ];
+    }
+
+
+# ranking - a record slot that handles 'rank the following' type questions
+ranking:
+  type: record
+  mandatory: |
+    sub {
+      my $self = shift;
+      return 1 unless defined $_[0];
+      return ! $self->normalize(@_);
+    }
+  # XXX: normalize is depreciated, but.. currently there is no simple
+  # way to override the check sub to run code after the subslot validation
+  normalize: |
+    sub {
+      my( $self, $val ) = @_;
+      my %val_counts;
+      for my $slt ( @{ $self->columns } ) {
+        next if ! exists $val->{ $slt->name }; # Should this be var_name
+        my $v = $val->{ $slt->name };
+        next if (! defined $v || $v =~ /^\s*$/);
+        if ( $val_counts{$v}++ ) {
+          die E->new("More than one criterion has the same ranking ($v)");
+        }
+      }
+      unless ( scalar keys %val_counts == $self->columns->[0]->max_val ) {
+        die E::Skip->new("You must rank the criterion from ".
+          $self->columns->[0]->min_val." to ".$self->columns->[0]->max_val );
+      }
+      return 1;
+    }
+
+
+# You can add more here
+
+
+phq_scale:
+  type: choice
+  options:
+    - 0: 'Not at all'
+    - 1: 'Several days'
+    - 2: 'More than half the days'
+    - 3: 'Nearly every day'
+  widget: choice_h_altvals
+  class: ynd
+  check: |
+    sub {
+      my ($self, $val) = @_;
+      # options is: [ { 0 => 'Not at all' }, { 1 => 'Several days' }, { 2 => 'More than half the days' }, { 3 => 'Nearly every day' } ]
+      my %opts = map { %$_ } @{ $self->options };
+      #  %opts: { 0 => 'Not at all', 1 => 'Several days'', 2 => 'More than half the days', 3 => 'Nearly every day' }
+      unless ($opts{$val}) { # assume "true" labels
+          die E->new("Not one of allowed responses");
+      }
+      return 1;
+    }
+  perdy_value: |
+    sub {
+      my ($self, $val) = @_;
+      return "" if ! defined $val; # empty string if not defined
+      my %opts = map { %$_ } @{ $self->options };
+      return $opts{$val} || $val;
+    }
+
+k10_scale:
+  type: choice
+  widget: choice_v
+  options:
+    - None of the time
+    - A little of the time
+    - Some of the time
+    - Most of the time
+    - All of the time
+
+scale_10_important:
+  type: choice
+  widget: choice_h
+  options:
+    - '1 Not at all important'
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - '10 Totally important'
+
+scale_10_confident:
+  type: choice
+  widget: choice_h
+  options:
+    - '1 Not at all confident'
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - '10 Totally confident'
+
+email_check:
+  type: text
+  input_type: email
+  widget: textfield
+  size: 80
+  check: |
+    sub {
+      my $self = shift;
+
+      if ($self->exists(@_)) {
+        die E->new("Email already exists");
+      }
+      # Normalize
+      my $email = Email::Valid->address( -address => lc $_[0], -mxcheck => 1 );
+      if ( ! $email ) {
+        die E->new( "You must supply a valid email address (not $_[0])" );
+      }
+      $_[0] = $email;
+      return !! $email;
+    }
+
+phone_check:
+  type: int
+  class: consent
+  min_val: 0
+  max_val: 9999999999
+#  mandatory: 1
+  check: |
+    sub {
+      my $self = shift;
+      $self->super(@_);
+
+      if ($self->exists(@_)) {
+        die E->new("Phone number already exists");
+      }
+
+      my $val = shift;
+
+      my $area_code = substr($val, 0, 2);
+      # Converting international prefix of 61 to 0
+      my $new_number;
+      if ($area_code == "61") {
+        $new_number = substr($val, 0, 2, "0");
+        $area_code  = substr($val, 0, 2);
+      }
+      my $length = length($val);
+      if ( ($length < 10) || ($length > 10) ) {
+        die E->new( "The mobile phone number supplied is incorrect, must be 10 digits" );
+      }
+      return 1;
+    }
+
+---
+start:
+  qns:
+    - text: |
+        <p>These questions concern how you have been feeling over the <u>past 30 days</u>. Select an option below each question that best represents how you have been.</p>
+      html: 1
+
+
+    - slot:
+        name: k1
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel tired out for no good reason?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k2
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel nervous?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k3
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel so nervous that nothing could calm you down?
+          html: 1
+        type: k10_scale
+
+
+---
+PAGE_001:
+  qns:
+    - text: |
+        <p>These questions concern how you have been feeling over the <u>past 30 days</u>. Select an option below each question that best represents how you have been.</p>
+      html: 1
+
+    - slot:
+        name: k4
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel hopeless?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k5
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel restless or fidgety?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k6
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel so restless you could not sit still?
+          html: 1
+        type: k10_scale
+
+---
+PAGE_002:
+  qns:
+    - text: |
+        <p>These questions concern how you have been feeling over the <u>past 30 days</u>. Select an option below each question that best represents how you have been.</p>
+      html: 1
+
+    - slot:
+        name: k7
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel depressed?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k8
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel that everything was an effort?
+          html: 1
+        type: k10_scale
+
+---
+PAGE_003:
+  qns:
+    - text: |
+        <p>These questions concern how you have been feeling over the <u>past 30 days</u>. Select an option below each question that best represents how you have been.</p>
+      html: 1
+
+    - slot:
+        name: k9
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel so sad that nothing could cheer you up?
+          html: 1
+        type: k10_scale
+
+    - slot:
+        name: k10
+        label:
+          text: During the <u><em>last 30 days</em></u>, about how often did you feel worthless?
+          html: 1
+        type: k10_scale
+
+---
+PAGE_004:
+  qns:
+    - text: |
+        <p>The next few questions are about how these feelings may have affected you in the last four weeks. You need not answer these questions if you answered 'None of the time' to all of the ten questions about your feelings.</p>
+      html: 1
+
+    - slot:
+        name: k11
+        label:
+          text: In the <u><em>last four weeks</em></u>, how many days were you <u>totally unable</u> to work, study, or manage your day to day activities because of these feelings?
+          html: 1
+        type: int
+        size: 4
+
+    - slot:
+        name: k12
+        label:
+          text: Aside from those days, in the <u><em>last four weeks</em></u>, how many days were you able to work, study, or manage your day to day activities, but had to <u>cut down</u> on what you did because of these feelings?
+          html: 1
+        type: int
+        size: 4
+
+---
+PAGE_005:
+  qns:
+
+    - slot:
+        name: k13
+        label:
+          text: In the <u><em>last four weeks</em></u>, how many times have you seen a doctor or any other health professional about these feelings?
+          html: 1
+        type: int
+        size: 4
+
+    - slot:
+        name: k14
+        label:
+          text: In the <u><em>last four weeks</em></u>, how often have physical health problems been the main cause of these feelings?
+          html: 1
+        type: k10_scale
+
+---
+PAGE_006:
+  qns:
+
+    - text: |
+        <p>Under each heading, please select ONE response that best describes your health <strong>today</strong>.</p>
+      html: 1
+
+    - slot:
+        name: eq1
+        label: MOBILITY
+        type: c_v
+        options:
+          - I have no problems in walking about
+          - I have slight problems in walking about
+          - I have moderate problems in walking about
+          - I have severe problems in walking about
+          - I am unable to walk about
+
+    - slot:
+        name: eq2
+        label: SELF-CARE
+        type: c_v
+        options:
+          - I have no problems washing or dressing myself
+          - I have slight problems washing or dressing myself
+          - I have moderate problems washing or dressing myself
+          - I have severe problems washing or dressing myself
+          - I am unable to wash or dress myself
+
+---
+PAGE_007:
+  qns:
+
+    - text: |
+        <p>Under each heading, please select ONE response that best describes your health <strong>today</strong>.</p>
+      html: 1
+
+    - slot:
+        name: eq3
+        label:  USUAL ACTIVITIES (e.g., work, study, housework, family, or leisure activities)
+        type: c_v
+        options:
+          - I have no problems doing my usual activities
+          - I have slight problems doing my usual activities
+          - I have moderate problems doing my usual activities
+          - I have severe problems doing my usual activities
+          - I am unable to do my usual activities
+
+
+---
+PAGE_008:
+  qns:
+
+    - text: |
+        <p>Under each heading, please select ONE response that best describes your health <strong>today</strong>.</p>
+      html: 1
+
+    - slot:
+        name: eq4
+        label: PAIN / DISCOMFORT
+        type: c_v
+        options:
+          - I have no pain or discomfort
+          - I have slight pain or discomfort
+          - I have moderate pain or discomfort
+          - I have severe pain or discomfort
+          - I have extreme pain or discomfort
+
+
+    - slot:
+        name: eq5
+        label: ANXIETY / DEPRESSION
+        type: c_v
+        options:
+          - I am not anxious or depressed
+          - I am slightly anxious or depressed
+          - I am moderately anxious or depressed
+          - I am severely anxious or depressed
+          - I am extremely anxious or depressed
+
+---
+PAGE_009:
+  qns:
+
+    - slot:
+        type: text
+        name: healthrange
+        widget: range
+    - slot:
+        name: eq_vas
+        label:
+          text: |
+            <p>We would like to know how good or bad your health is <u><em>today</em></u>.<br/>
+              This scale is numbered from 0 to 100.<br/>
+              100 means the <u><em>best</em></u> health you can imagine<br/>
+              0 means the <u><em>worst</em></u> health you can imagine.<br/>
+              Please click on the scale to indicate how your health is <u><em>today</em></u>.</p>
+              <h1 id="range-value"></h1>
+          html: 1
+        type: c_v
+
+---
+PAGE_010:
+# PHQ-9
+  qns:
+
+    - slot:
+        name: phq1
+        label:
+          text: Over the <u><em>last 2 weeks</em></u>, how often have you been bothered by little interest or pleasure in doing things?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: phq2
+        label:
+          text: Over the <u><em>last 2 weeks</em></u>, how often have you been bothered by feeling down, depressed or hopeless?
+          html: 1
+        type: phq_scale
+
+
+---
+PAGE_011:
+  qns:
+
+    - slot:
+        name: phq3
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by trouble falling or staying asleep, or sleeping too much?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: phq4
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by feeling tired or having little energy?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: phq5
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by poor appetite or overeating?
+          html: 1
+        type: phq_scale
+
+
+---
+PAGE_012:
+  qns:
+    - slot:
+        name: phq6
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by feeling bad about yourself - or that you are a failure or have let yourself or your family down?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: phq7
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by trouble concentrating on things, such as reading the newspaper or watching television?
+          html: 1
+        type: phq_scale
+
+
+---
+PAGE_013:
+  qns:
+
+    - slot:
+        name: phq8
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by moving or speaking so slowly that other people could have noticed? Or the opposite - being so fidgety or restless that you have been moving around a lot more than usual?
+          html: 1
+        type: phq_scale
+
+    - slot:
+        name: phq9
+        label:
+          text: Over the <u><em>last two weeks</em></u>, how often have you been bothered by thoughts that you would be better off dead or of hurting yourself in some way?
+          html: 1
+        type: phq_scale
+
+
+---
+PAGE_014:
+  qns:
+
+    - text: |
+        <p>In the past 6 months, have you seen any of the following <u>health professionals</u> because of your <u>mental health</u>?</p>
+      html: 1
+
+    - widget: following_questions
+      label: "General practitioner (GP)"
+      qn:
+        slot:
+          name: seen_gp
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: seen_gp_visits
+            type: int
+            size: 4
+            label: Number of visits
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_gp') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_gp_where
+            label: "Where did you see this health professional?"
+            type: c_v
+            class: not-bold
+            options:
+              - Doctor's room or other private practice
+              - General community health clinic
+              - Specialist community mental health clinic
+              - Community-based rehabilitation clinic
+              - Hospital outpatient clinic
+              - At a drug or alcohol service 
+              - At your home  
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_gp') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_gp_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_gp') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Practice nurse"
+      qn:
+        slot:
+          name: seen_nurse
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: seen_nurse_visits
+            type: int
+            size: 4
+            label: Number of visits
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_nurse') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_nurse_where
+            label: "Where did you see this health professional?"
+            type: c_v
+            class: not-bold
+            options:
+              - Doctor's room or other private practice
+              - General community health clinic
+              - Specialist community mental health clinic
+              - Community-based rehabilitation clinic
+              - Hospital outpatient clinic
+              - At a drug or alcohol service 
+              - At your home  
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_nurse') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_nurse_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_nurse') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Mental health nurse"
+      qn:
+        slot:
+          name: seen_mh_nurse
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: seen_mh_nurse_visits
+            type: int
+            size: 4
+            label: Number of visits
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_mh_nurse') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_mh_nurse_where
+            label: "Where did you see this health professional?"
+            type: c_v
+            class: not-bold
+            options:
+              - Doctor's room or other private practice
+              - General community health clinic
+              - Specialist community mental health clinic
+              - Community-based rehabilitation clinic
+              - Hospital outpatient clinic
+              - At a drug or alcohol service 
+              - At your home  
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_mh_nurse') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_mh_nurse_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_mh_nurse') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Psychiatrist"
+      qn:
+        slot:
+          name: seen_psychiatrist
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: seen_psychiatrist_visits
+            type: int
+            size: 4
+            label: Number of visits
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_psychiatrist') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_psychiatrist_where
+            label: "Where did you see this health professional?"
+            type: c_v
+            class: not-bold
+            options:
+              - Doctor's room or other private practice
+              - General community health clinic
+              - Specialist community mental health clinic
+              - Community-based rehabilitation clinic
+              - Hospital outpatient clinic
+              - At a drug or alcohol service 
+              - At your home  
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_psychiatrist') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_psychiatrist_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_psychiatrist') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Psychologist"
+      qn:
+        slot:
+          name: seen_psychologist
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: seen_psychologist_visits
+            type: int
+            size: 4
+            label: Number of visits
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_psychologist') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_psychologist_where
+            label: "Where did you see this health professional?"
+            type: c_v
+            class: not-bold
+            options:
+              - Doctor's room or other private practice
+              - General community health clinic
+              - Specialist community mental health clinic
+              - Community-based rehabilitation clinic
+              - Hospital outpatient clinic
+              - At a drug or alcohol service 
+              - At your home  
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_psychologist') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_psychologist_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_psychologist') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Other Allied Health Professional (e.g. Occupational therapist, Counsellor, Social worker)"
+      qn:
+        slot:
+          name: seen_other_pro
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: seen_other_pro_specify
+            type: text
+            size: 80
+            label: Please specify
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_other_pro') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_other_pro_visits
+            type: int
+            size: 4
+            label: Number of visits
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_other_pro') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_other_pro_where
+            label: "Where did you see this health professional?"
+            type: c_v
+            class: not-bold
+            options:
+              - Doctor's room or other private practice
+              - General community health clinic
+              - Specialist community mental health clinic
+              - Community-based rehabilitation clinic
+              - Hospital outpatient clinic
+              - At a drug or alcohol service 
+              - At your home  
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_other_pro') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_other_pro_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_other_pro') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Other"
+      qn:
+        slot:
+          name: seen_other
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: seen_other_specify
+            type: text
+            size: 80
+            label: Please specify
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_other') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_other_visits
+            type: int
+            size: 4
+            label: Number of visits
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_other') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_other_where
+            label: "Where did you see this health professional?"
+            type: c_v
+            class: not-bold
+            options:
+              - Doctor's room or other private practice
+              - General community health clinic
+              - Specialist community mental health clinic
+              - Community-based rehabilitation clinic
+              - Hospital outpatient clinic
+              - At a drug or alcohol service 
+              - At your home  
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_other') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: seen_other_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('seen_other') == 1;
+                return 0;
+              }
+
+
+
+---
+PAGE_015:
+  qns:
+    - text: |
+        <p>In the past 6 months, have you used any of the services below for your <u>mental health</u>?</p>
+      html: 1
+
+    - widget: following_questions
+      label: "Online therapy"
+      qn:
+        slot:
+          name: service_online
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: service_online_specify
+            type: text
+            size: 80
+            label: Please specify
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('service_online') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: service_online_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('service_online') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Smartphone app"
+      qn:
+        slot:
+          name: service_app
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: service_app_specify
+            type: text
+            size: 80
+            label: Please specify
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('service_app') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: service_app_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('service_app') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Self-help materials like (e)books/DVDs/magazines"
+      qn:
+        slot:
+          name: service_self
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: service_self_times
+            type: int
+            size: 4
+            label: How many times did you use this service?
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('service_self') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: service_self_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('service_self') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Received help from an ambulance"
+      qn:
+        slot:
+          name: service_ambulance
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: service_ambulance_times
+            type: int
+            size: 4
+            label: How many times did you use this service?
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('service_ambulance') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: service_ambulance_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('service_ambulance') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Attended a hospital emergency department or casualty ward"
+      qn:
+        slot:
+          name: service_hospital
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: service_hospital_times
+            type: int
+            size: 4
+            label: How many times did you use this service?
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('service_hospital') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: service_hospital_money
+            type: real
+            qn_heading:
+              text: On average <u>how much did you pay of your own money</u> each time you used this service? (if applicable)
+              html: 1
+            label: 
+              text: $
+              position: left
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('service_hospital') == 1;
+                return 0;
+              }
+
+---
+PAGE_016:
+  qns:
+    - text: |
+        <p>In the past 6 months, have you been admitted at least overnight to … ?</p>
+      html: 1
+
+    - widget: following_questions
+      label: "A general hospital"
+      qn:
+        slot:
+          name: admitted_hospital
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: admitted_hospital_nights
+            type: int
+            size: 4
+            label: How many nights did you stay (counting all admissions)?
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('admitted_hospital') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: admitted_hospital_reason
+            type: text
+            size: 80
+            label: What was the reason for the admission?
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('admitted_hospital') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Community Care Unit (CCU)"
+      qn:
+        slot:
+          name: admitted_CCU
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: admitted_CCU_nights
+            type: int
+            size: 4
+            label: How many nights did you stay (counting all admissions)?
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('admitted_CCU') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: admitted_CCU_reason
+            type: text
+            size: 80
+            label: What was the reason for the admission?
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('admitted_CCU') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Prevention and recovery care centres (PARC)"
+      qn:
+        slot:
+          name: admitted_PARC
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: admitted_PARC_nights
+            type: int
+            size: 4
+            label: How many nights did you stay (counting all admissions)?
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('admitted_PARC') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: admitted_PARC_reason
+            type: text
+            size: 80
+            label: What was the reason for the admission?
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('admitted_PARC') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Other "
+      qn:
+        slot:
+          name: admitted_other
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: admitted_other_specify
+            type: text
+            size: 80
+            label: Please specify
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('admitted_other¥') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: admitted_other_nights
+            type: int
+            size: 4
+            label: How many nights did you stay (counting all admissions)?
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('admitted_other') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: admitted_other_reason
+            type: text
+            size: 80
+            label: What was the reason for the admission?
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('admitted_other') == 1;
+                return 0;
+              }
+
+
+
+---
+PAGE_017:
+  qns:
+
+    - slot:
+        name: med
+        label: 
+          text: Do you take any medication for your <u>mental health</u>?
+          html: 1
+        type: y_n_v
+
+
+---
+PAGE_018:
+  qns:
+
+    - text: Will need list of medicine from Melb Uni
+      html: 1
+
+---
+PAGE_019:
+  qns:
+    - text: |
+        <p>Have you had to take <u>any time off</u> from any of your usual activities (such as paid work) in the past 6 months? Please complete the questions below regarding different types of activities.</p>
+      html: 1
+
+    - widget: following_questions
+      label: "Paid work"
+      qn:
+        slot:
+          name: off_work_paid
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: off_work_paid_hours
+            type: int
+            size: 4
+            label: 
+              text: hours on
+              position: right
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('off_work_paid') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: off_work_paid_days
+            type: int
+            size: 4
+            label: 
+              text: days in past 6 months
+              position: right
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('off_work_paid') == 1;
+                return 0;
+              }
+
+    - widget: following_questions
+      label: "Unpaid work (This may include study, voluntary work, house-keeping.)"
+      qn:
+        slot:
+          name: off_work_unpaid
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: off_work_unpaid_hours
+            type: int
+            size: 4
+            label: 
+              text: hours on
+              position: right
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('off_work_unpaid') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: off_work_unpaid_days
+            type: int
+            size: 4
+            label: 
+              text: days in past 6 months
+              position: right
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('off_work_unpaid') == 1;
+                return 0;
+              }
+
+---
+PAGE_020:
+  qns:
+    - text: |
+        <strong><p>During the last 6 months have there been days in which you <u>worked but were bothered</u> by mental health problems?</p></strong>
+      html: 1
+
+    - widget: following_questions
+      qn:
+        slot:
+          name: worked_bothered
+          type: c_v
+#          mandatory: 1
+          options:
+            - Yes
+            - No
+      follow_when: 1
+      follow_with:
+        - qn:
+        - slot:
+            name: worked_bothered_hours
+            type: int
+            size: 4
+            label: 
+              text: hours on
+              position: right
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('worked_bothered') == 1;
+                return 0;
+              }
+        - qn:
+        - slot:
+            name: worked_bothered_days
+            type: int
+            size: 4
+            label: 
+              text: days in past 6 months
+              position: right
+            class: not-bold
+            mandatory: |
+              sub {
+                my ($slot, $bytes, $ses) = @_;
+                return 1 if $ses->get('worked_bothered') == 1;
+                return 0;
+              }
+
+---
+PAGE_021:
+  qns:
+
+    - slot:
+        class: single-line
+        name: motivation
+        label: 
+          text: On average, how much of your normal <u>work capacity</u> were you able to achieve on the days that you were bothered by mental health problems? Please select the number that fits best.
+          html: 1
+        type: c_h
+        options:
+          - '1 None of what I would normally'
+          - 2
+          - 3
+          - 4
+          - '5 Half as much as I would normally do'
+          - 6
+          - 7
+          - 8
+          - 9
+          - '10 Worked at full capacity'
+
+---
+last:
+  nav:
+    - first: Start
+    - next: Submit
+    - prev: Prev
+  next: sub { $_[1]->set(completed=>time()); 'completed' }
+  percent: 99
+  qns:
+    - text: "[% PROCESS last %]"
+      tt2: 1
+

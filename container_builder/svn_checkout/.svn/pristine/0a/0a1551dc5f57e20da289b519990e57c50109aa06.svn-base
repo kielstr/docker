@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+<testsuite errors="9" failures="0" name="unittest.suite._ErrorHolder-20170928034028" tests="9" time="0.000">
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase0)" time="0.000">
+		<error message="Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+" type="WebDriverException">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 343, in setUpClass
+    super(TestCase0, cls).setUpClass()
+  File "/shared/helpers/web_survey_helpers.py", line 24, in setUpClass
+    cls.driver = webdriver.Chrome('helpers/chromedriver')
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/chrome/webdriver.py", line 62, in __init__
+    self.service.start()
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/common/service.py", line 86, in start
+    os.path.basename(self.path), self.start_error_message)
+WebDriverException: Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase1)" time="0.000">
+		<error message="Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+" type="WebDriverException">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 754, in setUpClass
+    super(TestCase1, cls).setUpClass()
+  File "/shared/helpers/web_survey_helpers.py", line 24, in setUpClass
+    cls.driver = webdriver.Chrome('helpers/chromedriver')
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/chrome/webdriver.py", line 62, in __init__
+    self.service.start()
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/common/service.py", line 86, in start
+    os.path.basename(self.path), self.start_error_message)
+WebDriverException: Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase2)" time="0.000">
+		<error message="Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+" type="WebDriverException">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 800, in setUpClass
+    super(TestCase2, cls).setUpClass()
+  File "/shared/helpers/web_survey_helpers.py", line 24, in setUpClass
+    cls.driver = webdriver.Chrome('helpers/chromedriver')
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/chrome/webdriver.py", line 62, in __init__
+    self.service.start()
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/common/service.py", line 86, in start
+    os.path.basename(self.path), self.start_error_message)
+WebDriverException: Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase3)" time="0.000">
+		<error message="Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+" type="WebDriverException">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 845, in setUpClass
+    super(TestCase3, cls).setUpClass()
+  File "/shared/helpers/web_survey_helpers.py", line 24, in setUpClass
+    cls.driver = webdriver.Chrome('helpers/chromedriver')
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/chrome/webdriver.py", line 62, in __init__
+    self.service.start()
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/common/service.py", line 86, in start
+    os.path.basename(self.path), self.start_error_message)
+WebDriverException: Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase4)" time="0.000">
+		<error message="Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+" type="WebDriverException">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 890, in setUpClass
+    super(TestCase4, cls).setUpClass()
+  File "/shared/helpers/web_survey_helpers.py", line 24, in setUpClass
+    cls.driver = webdriver.Chrome('helpers/chromedriver')
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/chrome/webdriver.py", line 62, in __init__
+    self.service.start()
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/common/service.py", line 86, in start
+    os.path.basename(self.path), self.start_error_message)
+WebDriverException: Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase5)" time="0.000">
+		<error message="Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+" type="WebDriverException">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 934, in setUpClass
+    super(TestCase5, cls).setUpClass()
+  File "/shared/helpers/web_survey_helpers.py", line 24, in setUpClass
+    cls.driver = webdriver.Chrome('helpers/chromedriver')
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/chrome/webdriver.py", line 62, in __init__
+    self.service.start()
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/common/service.py", line 86, in start
+    os.path.basename(self.path), self.start_error_message)
+WebDriverException: Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase6)" time="0.000">
+		<error message="Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+" type="WebDriverException">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 980, in setUpClass
+    super(TestCase6, cls).setUpClass()
+  File "/shared/helpers/web_survey_helpers.py", line 24, in setUpClass
+    cls.driver = webdriver.Chrome('helpers/chromedriver')
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/chrome/webdriver.py", line 62, in __init__
+    self.service.start()
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/common/service.py", line 86, in start
+    os.path.basename(self.path), self.start_error_message)
+WebDriverException: Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase7)" time="0.000">
+		<error message="Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+" type="WebDriverException">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 1025, in setUpClass
+    super(TestCase7, cls).setUpClass()
+  File "/shared/helpers/web_survey_helpers.py", line 24, in setUpClass
+    cls.driver = webdriver.Chrome('helpers/chromedriver')
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/chrome/webdriver.py", line 62, in __init__
+    self.service.start()
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/common/service.py", line 86, in start
+    os.path.basename(self.path), self.start_error_message)
+WebDriverException: Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+
+]]>		</error>
+	</testcase>
+	<testcase classname="unittest.suite._ErrorHolder" name="TestCase8)" time="0.000">
+		<error message="Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+" type="WebDriverException">
+<![CDATA[Traceback (most recent call last):
+  File "/shared/test.py", line 1070, in setUpClass
+    super(TestCase8, cls).setUpClass()
+  File "/shared/helpers/web_survey_helpers.py", line 24, in setUpClass
+    cls.driver = webdriver.Chrome('helpers/chromedriver')
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/chrome/webdriver.py", line 62, in __init__
+    self.service.start()
+  File "/usr/local/lib/python2.7/site-packages/selenium/webdriver/common/service.py", line 86, in start
+    os.path.basename(self.path), self.start_error_message)
+WebDriverException: Message: 'chromedriver' executable may have wrong permissions. Please see https://sites.google.com/a/chromium.org/chromedriver/home
+
+]]>		</error>
+	</testcase>
+	<system-out>
+<![CDATA[]]>	</system-out>
+	<system-err>
+<![CDATA[]]>	</system-err>
+</testsuite>

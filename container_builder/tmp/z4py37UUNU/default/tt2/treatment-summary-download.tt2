@@ -1,0 +1,14 @@
+[%-
+    META
+       content_type        = "application/pdf"
+       content_disposition = 'attachment; filename="TreatmentHistory.pdf"'
+-%]
+
+[%-
+    style = 'just_content'
+-%]
+
+[%-
+    url = conf.webserver_info.fe_url _ '/treatment-summary.tt2?SD_KEY=' _ args.SD_KEY;
+    conf.url_to_pdf(url);
+-%]

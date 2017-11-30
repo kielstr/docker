@@ -1,0 +1,4 @@
+#!/bin/bash
+
+SURVEYS_DIR=/surveys
+(ws-yml-export -c /surveys/$1/conf/config.pl -o) | ws-yml-map Dump CR "CSV($1.csv)" Null

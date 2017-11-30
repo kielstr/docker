@@ -1,0 +1,125 @@
+[%-
+SET in_survey = 1;
+IF page.widget_set.defined;
+  widget_set = page.widget_set; # The widget set to use on this page
+END;
+IF page.layout.defined;
+  layout = page.layout; # Specify the wrapper (layout) around each slot on this page
+END;
+# Generate the markup for the navigation buttons, as we need the 'default'
+# action as a hidden submit
+default_nav_action = {};
+navigation_button_markup = PROCESS nav_buttons;
+-%]
+
+
+[%# Talk to ash. This is to fix a v006 templates js breaking bug %]
+<div class="error sr-only" aria-hidden="true"></div>
+<div class="error sr-only" aria-hidden="true"></div>
+
+
+[%- IF page.section.lead %]
+  <div class="section_lead">[% PROCESS qns qns=page.section.lead %]</div>
+[%- END %]
+<div class="form_element">
+[%- IF page.section.header %]
+  <div class="section_header">[% PROCESS qns qns=page.section.header %]</div>
+[%- END %]
+<form novalidate action="q" method="[% page.method || 'post' %]"
+  [%- IF page.enctype -%]enctype="[% page.enctype %]" [%- END %]>
+<input type="hidden" name="debug" value="[% args.debug | html %]" />
+<input type="hidden" name="page" value="[% page.name %]" />
+<input type="hidden" name="[% conf.get_session.CookieName %]" value="[% FILTER html; args.${conf.get_session.CookieName} || session.session_key; END %]" />
+[%- IF default_nav_action.defined('action') %]
+  <input type="submit" name="action.[% default_nav_action.action %]"
+   value="[% default_nav_action.label %]" class="hidden-button button_[% default_nav_action.action %]" />
+[%- END %]
+[%- qns_output = PROCESS qns qns=page.qns %]
+[%- PERL %]
+my $slot_errs = $stash->get('slot_errors');
+if ( ref $slot_errs eq 'HASH' && keys %$slot_errs ) {
+  my $enone = SD::Handler::contains_only( 'E::None', $slot_errs );
+  $stash->set('page_contains_errors', ! $enone );
+}
+[%- END %]
+[% INCLUDE glossary.tt2 %]
+[%- IF page_contains_errors %]
+  <div class="error" role="alert">Please see the error messages below and amend your answers before proceeding</div>
+[%- END %]
+<div class="row">
+  [%- qns_output %]
+</div>
+<br />
+[%- IF page.section.footer %]
+  <div class="section_footer">[% PROCESS qns qns=page.section.footer %]</div>
+[%- END %]
+<br />
+[%- navigation_button_markup %]
+</form>
+</div>
+
+[%- IF page.js_calc -%]
+    <script type="text/javascript">
+        $(document).ready(function(){
+        [% FOREACH line IN page.js_calc %]
+            [% line_parts = line.split( '\s+' ) %]
+            [% matches = line_parts.1.match('^([\*\^\$])') %]
+            [% anchor = '*' %]
+            [% IF matches.0.defined;
+                anchor = matches.0;
+                line_parts.1 = line_parts.1.remove('^.');
+            END %]
+            $("input[name[% anchor %]='[% line_parts.1 %]'][type!=hidden]").sum("keyup", "[id='[% line_parts.3 %]']");
+        [% END %]
+        });
+   </script>
+[%- END -%]
+
+[%# following_questions code %]
+<script>
+  $(document).ready(function() {
+    [% FOREACH qn IN page.qns %]
+      [% IF qn.widget == 'following_questions' %]
+
+        [%# determine the type of widget being used as the trigger %]
+        [% type = qn.qn.widget.search('choice')
+          ? qn.qn.options.size > 1
+            ? 'radio'
+            : 'checkbox'
+          : qn.qn.widget
+        %]
+
+        [%# generate the javascript that will test if the following questions are to be shown %]
+        [%
+          IF type == 'checkbox';
+            test = 'element.prop("checked")';
+            selector = 'name="slot.' _ qn.qn.name _ '"';
+          ELSIF type == 'radio';
+            test = 'element.prop("checked")';
+            selector = 'name="slot.' _ qn.qn.name _ '"';
+            # TODO throw an error here if follow_when isn't defined
+            SET test_strings = [];
+            FOREACH value IN qn.follow_when.split(',');
+              test_strings.push("element.val() == $value");
+            END;
+            test = test _ '&& ( ' _ test_strings.join(' || ') _ ')';
+          ELSIF type == 'select';
+            selector = 'name="slot.' _ qn.qn.name _ '"';
+            # TODO throw an error here if follow_when isn't defined
+            SET test_strings = [];
+            FOREACH value IN qn.follow_when.split(',');
+              test_strings.push("element.val() == $value");
+            END;
+            test = test_strings.join(' || ');
+          END;
+        %]
+
+        [%# actually make the call to set up the trigger %]
+        set_following_questions_trigger( $('[[% selector %]]'), function (element) { return [% test %] } );
+      [% END %]
+    [% END %]
+
+  });
+
+</script>
+

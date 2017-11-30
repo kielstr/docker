@@ -1,0 +1,40 @@
+<div class="rangeslider__container">
+
+  <div class="rangeslider__numbers">
+    <ol>
+      <li>100</li>
+      <li>75</li>
+      <li>50</li>
+      <li>25</li>
+      <li>0</li>
+    </ol>
+  </div>
+  <input
+      type="range"
+      name="slot.[% nspace %]"
+      id="[% nspace %]"
+      value="[% val | html %]"
+      min="0"
+      max="100"
+      step="1"
+      data-rangeslider
+      data-orientation="vertical"
+  />
+
+</div>
+
+<script>
+    $(document).ready(function() {
+      function setValue() {
+        var value = $('input[type="range"]').val();
+        $("#range-value").text(value);
+      }
+
+      $('input[type="range"]').rangeslider({
+        polyfill: false,
+        onSlideEnd: setValue,
+      });
+
+      setValue();
+    });
+</script>

@@ -1,0 +1,14 @@
+[%
+  difficult_areas    = session.get('q2');
+  intervention_areas = conf.intervention_areas;
+
+  first_area  = intervention_areas.${ difficult_areas.first }.sentence_text;
+  second_area = intervention_areas.${ difficult_areas.last }.sentence_text;
+%]
+
+[% IF difficult_areas.size == 2 %]
+  <strong>[% first_area %]</strong> and <strong>[% second_area %]</strong>
+[% ELSE %]
+  <strong>[% first_area %]</strong>
+[% END %]
+

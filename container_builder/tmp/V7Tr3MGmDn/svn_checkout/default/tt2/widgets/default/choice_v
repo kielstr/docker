@@ -1,0 +1,64 @@
+[%-
+num_opts = s.options.size;
+type = (s.isa("SD::Slot::Multi") || num_opts == 1) ? 'checkbox' : 'radio';
+other_values = []; #many answers in order
+
+other_values_testing = [];
+
+FOR x IN [0 .. num_opts];
+    other_values_testing.$x = '';
+END;
+
+prev_val = 0;
+
+FOREACH v = val.list;
+  checked.$v = 1;
+
+  UNLESS v.match('^\d*$') AND v <= num_opts;
+    other_values.push(v);
+    other_values_testing.$prev_val = v;
+  END;
+
+  prev_val = v;
+END;
+
+-%]
+
+<ul class="choice_v">
+  [%- FOREACH opt = s.options %]
+  [% DEFAULT opt.size = 30 %]
+  <li>
+    [% IF opt.type %]
+      <label for="slot.[% nspace %]">
+        [% opt.label %]
+      </label>
+
+      <input type="[% opt.type %]" name="slot.[% nspace %]" value="[% other_values_testing.${ loop.index } %]" size="[% opt.size %]"
+        id="slot.[% nspace %].[% loop.count %]" autofocus
+        [% 'checked="checked"' IF checked.item(loop.count) %]
+        [%
+          SET cmd = "clear_field(\"skip.${s.name}\");" IF e.isa('E::Skip::Warn');
+          IF s.autosubmit; # side effect misparsed
+              cmd = cmd _ 'document.forms[0]["action.next"].click();';
+          END;
+          "onClick='$cmd'" IF cmd;
+        -%] />
+    [% ELSE  %]
+      <input type="[%  type %]" name="slot.[% nspace %]" value="[% loop.count %]"
+        id="slot.[% nspace %].[% loop.count %]" autofocus
+        [% 'checked="checked"' IF checked.item(loop.count) %]
+        [%
+          SET cmd = "clear_field(\"skip.${s.name}\");" IF e.isa('E::Skip::Warn');
+          IF s.autosubmit; # side effect misparsed
+              cmd = cmd _ 'document.forms[0]["action.next"].click();';
+          END;
+          "onClick='$cmd'" IF cmd;
+        -%] />
+
+      <label for="slot.[% nspace %].[% loop.count %]">
+       [% INCLUDE qns qns=opt nspace='' %]
+      </label>
+    [%- END %]
+  </li>
+  [%- END %]
+</ul>

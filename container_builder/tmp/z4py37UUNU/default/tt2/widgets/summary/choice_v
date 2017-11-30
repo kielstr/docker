@@ -1,0 +1,32 @@
+[% IF val.length == 0 || val.list.size == 0 %]
+<div class="widget_choice_v_row answers">
+    <span class="text">[ No Response ]</span>
+</div>
+[% END %]
+[% SET dont_check = 1 IF e.isa('E::Multi'); # allow non-JS recovery of opens
+   FOREACH v = val.list ; 
+     checked.$v = 1 UNLESS dont_check; 
+     SET other_val = v UNLESS v.match('^\d+$') && v <= s.options.size; # one only
+   END %]
+[% FOREACH opt = s.options %]
+ [%- IF checked.item(loop.count) -%]
+ <div class="widget_choice_v_row answers">
+  <div class="widget_choice_v">
+   [% IF opt == '';
+       IF s.summary_blank_text;
+         s.summary_blank_text | html;
+       ELSE %]
+         <img src="html/images/tick.gif" alt="Completed" />
+      [% END %]
+   [% ELSE %]
+     [% INCLUDE qns qns=opt nspace='' %]
+   [% END %]
+  </div>
+ </div>
+ [% END %]
+[% END %]
+[% IF other_val %]
+<div class="widget_choice_v_row answers">
+ [% other_val | html %]
+</div>
+[% END %]

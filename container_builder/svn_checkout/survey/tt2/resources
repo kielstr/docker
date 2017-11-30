@@ -1,0 +1,88 @@
+<h1>Resources</h1>
+
+[%
+  phn      = session.get('phn');
+  location = session.get('location');
+
+  # This var reads the resources from survey/conf/resources.yaml and loads the data
+  # structure into a variable as a set of hashes.
+
+  resources_for_phn  = conf.resource_data.$phn;
+  selected_resources = session.get('q2');
+
+  IF !selected_resources || selected_resources.size == 0;
+    selected_resources = [];
+    areas = conf.intervention_areas.keys().sort();
+
+    FOR area IN areas;
+      IF conf.intervention_areas.$area.difficult(session);
+        selected_resources.push(area);
+      END;
+    END;
+
+    IF selected_resources.size == 0;
+      selected_resources = ['generic'];
+    END;
+
+  END;
+%]
+
+[% FOREACH selected_resource IN selected_resources %]
+      [% IF selected_resource != 'generic' %]
+      <h3>To help with [% conf.intervention_areas.$selected_resource.sentence_text %]</h3> <br>
+      [% END %]
+      <table class="resources-table">
+        <tr>
+          <th>Type of support</th>
+          <th>Name</th>
+          <th>Details</th>
+        </tr>
+
+        [% FOREACH resource IN resources_for_phn.item(selected_resource) %]
+          [% NEXT IF resource.location && resource.location != location %]
+          <tr>
+            <td>[% resource.item('resource_mode') %]</td>
+            <td><a href="[% resource.item('resource_link') %]" target="_blank">[% resource.item('resource_name') %]</a></td>
+            <td>[% resource.item('resource_details') %]</td>
+          </tr>
+        [% END %]
+
+      </table>
+<div class="nextpage"></div>
+[% END %]
+
+<style>
+.resources-table {
+  width:100%;
+  font-family: arial, sans-serif;
+  width: 100%;
+}
+
+.nextpage {
+display:none;
+}
+@media print {
+  .nextpage {
+  display:block;
+  page-break-before: always;
+  }
+}
+
+.resources-table td, .resources-table th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+@media screen and (min-width:500px) {
+
+  .resources-table > tbody > tr > th:nth-child(1) {
+    width:20%;
+  }
+  .resources-table > tbody > tr > th:nth-child(2) {
+    width:20%;
+  }
+
+}
+
+</style>

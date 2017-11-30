@@ -1,0 +1,44 @@
+---
+- term: randomised controlled trial
+  definition: |
+    <em><p>Randomised controlled trials are the gold standard of scientific testing. They let us compare different approaches to care and find out whether one is more effective than the other. Random allocation helps make sure that the people trying each approach to care are similar.</p>
+    <p>Neither the Link-me team nor your GP have control over who will be allocated to each approach to care.</p></em>
+- term: What are the benefits and risks of taking part?
+  definition: |
+    <em><p>Benefits: Link-me will provide you the opportunity to reflect on your mental health and wellbeing. With your help, we can find out if the Link-me approach can help people find the right support for their mental health. </p>
+    <p>Risks: For some people, reflecting on mental health and wellbeing can be distressing. If you are concerned, please speak to your GP.</p></em>
+- term: What will happen to information about me?
+  definition: |
+    <em><p>All the information you give us is private. Only the research team at the University of Melbourne will have access to your information. We can only disclose information with your permission, or as required by law. The trial results will be presented in a report to the Australian Government Department of Health and may also be presented at conferences and published in professional journals. You will not be identified or linked to the results.</p>
+    <p>During the trial, all information will be stored on the trial website, which complies with the Australian Government’s security requirements. After the trial, we will delete your identifying details and store your data at the University of Melbourne for a minimum of 15 years as required by the Human Research Ethics Committee. </p>
+    <p>If you withdraw from the research project we will keep using any information we have already collected unless you tell us not to.</p></em>
+- term: Link-me and my GP
+  definition: |
+    <em><p>Participating in Link-me does not replace your usual GP care. <br/>To keep your GP up-to-date about any treatment you may receive as part of Link-me, we might need to access your medical record at the practice.</p></em>
+- term: Link-me and my health service use
+  definition: |
+    <em><p>As well as asking you to complete surveys about your 
+    mental health and health care, we would like your 
+    permission to access the following routinely collected 
+    data about your use of:</p>
+    <p><ul>
+      <li>Medicare and the Pharmaceutical Benefits Scheme</li>
+      <li>Primary mental health care</li>
+      <li>headspace, the National Youth Mental Health Foundation (if you are aged under 25)</li>
+    </ul></p>
+    <p>We will send you more information and a link to a 
+    separate consent form authorising us to access this 
+    data. You can take part in Link-me whether you agree to 
+    provide us access to this data or not. </p></em>
+- term: Who can I contact about this trial?
+  definition: |
+    <em><p>If you would like more information about Link-me, please contact us at <a href="mailto:link-me@unimelb.edu.au.">link-me@unimelb.edu.au</a>.</p>
+    <p>This trial has been approved by the Human Research Ethics Committee of The University of Melbourne. If you have any concerns or complaints about the conduct of this trial, which you do not wish to discuss with the research team, you should contact:</p>
+    <p>Manager<br/>
+      Human Research Ethics<br/>
+      Research Ethics and Integrity<br/>
+      University of Melbourne<br/>
+      VIC 3010.<br/>
+      P: (03) 8344 2073<br/>
+      E: <a href="mailto:HumanEthics-complaints@unimelb.edu.au">HumanEthics-complaints@unimelb.edu.au</a></p>
+    <p>All complaints will be treated confidentially. In any correspondence please provide the name of the research team or the name or ethics ID number of the research project.</p></em>

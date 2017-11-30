@@ -1,0 +1,26 @@
+version: '2'
+services:
+  postgres:
+  #  restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - "$PWD/postgres/data:/var/lib/postgresql"
+    image: postgres:9.6.3
+    environment:
+      POSTGRES_USER: kiel
+      POSTGRES_PASSWORD: Tripper
+      POSTGRES_DB: test
+    tty: true
+    
+  minionworker: 
+    image: minion_build
+    command: /data/worker.pl
+    volumes:
+      - $PWD/minion/data:/data
+    environment:
+      CONNECTION_STRING: 'postgresql://kiel:Tripper@kiels-laptop/test'
+      NUMBER_OF_JOBS: 12
+    depends_on:
+      - postgres
+    tty: true

@@ -1,0 +1,25 @@
+[%-
+SET other_val = '';
+FOREACH v = val.list ;
+  checked.$v = 1;
+  SET other_val = v UNLESS v.match('^\d+$') && v <= s.options.size; # one only
+END
+-%]
+
+[%- MACRO render_option(opt,checked) BLOCK %]
+  [%- IF checked %]
+      [% opt_text = (opt.values.size ? opt.values.first : opt ) %]
+      [% INCLUDE qn q=opt_text %]
+  [%- END -%]
+[%- END -%]
+
+<span class="choice-summary">
+    [% IF val == '' %]
+      [ No Response ]
+    [% ELSE %]
+      [%- FOREACH opt = s.options %]
+        [% opt_val = (opt.keys.size ? opt.keys.first : loop.count ) %]
+        [% render_option(opt, checked.item(opt_val) ) %]
+      [% END %]
+    [% END %]
+</span>
