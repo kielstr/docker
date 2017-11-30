@@ -8,9 +8,9 @@ services:
       - "$PWD/postgres/data:/var/lib/postgresql"
     image: postgres:9.6.3
     environment:
-      POSTGRES_USER: kiel
-      POSTGRES_PASSWORD: Tripper
-      POSTGRES_DB: test
+      POSTGRES_USER: mic
+      POSTGRES_PASSWORD: mic
+      POSTGRES_DB: mic
     tty: true
     
   minionworker: 
@@ -19,7 +19,7 @@ services:
     volumes:
       - $PWD/minion/data:/data
     environment:
-      CONNECTION_STRING: 'postgresql://kiel:Tripper@kiels-laptop/test'
+      CONNECTION_STRING: 'postgresql://mic:mic@kiels-laptop/mic'
       NUMBER_OF_JOBS: 12
     depends_on:
       - postgres
