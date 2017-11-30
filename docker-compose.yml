@@ -1,7 +1,7 @@
 version: '2.1'
+
 services:
   postgres:
-  #  restart: always
     ports:
       - "5432:5432"
     volumes:
@@ -52,4 +52,6 @@ services:
         condition: service_healthy
       minion_worker:
         condition: service_healthy
+
+
 #docker-compose rm -v postgres
