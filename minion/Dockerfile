@@ -13,9 +13,11 @@ RUN apt-get -y install \
 	libnet-address-ip-local-perl \
 	less \
 	joe \
-        libdbd-pg-perl
+    libdbd-pg-perl
 RUN curl -L http://cpanmin.us | perl - App::cpanminus
 RUN cpanm -i -n Mojolicious
 RUN cpanm -i -n Minion
 
 RUN cpanm -i -n Mojo::Pg
+
+COPY ./db_ready.pl /bin/db_ready.pl

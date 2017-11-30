@@ -1,0 +1,50 @@
+version: "3.4"
+
+networks:
+     net:
+         driver: overlay
+         
+volumes: 
+    nfs:
+        driver: local
+        driver_opts:
+            type: nfs
+            o: addr=10.0.0.1,rw
+            device: ":/mnt/nfs/webapp/acidworx/AW1/dev/AcidWorx"
+configs:
+    traefik-config:
+        file: config.toml
+
+services:
+    traefik:
+        image: traefik:1.4
+        ports:
+            - 80:8081
+            - 8080:8080
+        networks:
+            - net
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        configs:
+            - source: traefik-config
+              target: /etc/traefik/traefik.toml
+        deploy:
+            placement:
+                constraints:
+                    - node.role == manager
+    acidworx:
+        image: kiels-laptop:5000/acidworx
+        build: .
+        networks:
+            - net
+        volumes:
+            - /Users/kiel/swarm/acidworx/AW1/dev/AcidWorx:/acidworx
+            #- nfs:/acidworx
+        deploy:
+              placement:
+                  constraints:
+                      - node.role == worker
+        labels:
+            - "traefik.port=8081"
+            - "traefik.backend=acidworx"
+            - "traefik.frontend.rule=Host:kiels-laptop.intra.acidchild.org"

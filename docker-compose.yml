@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 services:
   postgres:
   #  restart: always
@@ -7,20 +7,49 @@ services:
     volumes:
       - "$PWD/postgres/data:/var/lib/postgresql"
     image: postgres:9.6.3
-    environment:
-      POSTGRES_USER: mic
-      POSTGRES_PASSWORD: mic
-      POSTGRES_DB: mic
+    build: $PWD/postgres
+    env_file:
+      - db.env
+
     tty: true
-    
-  minionworker: 
+    healthcheck:
+      test: ["CMD-SHELL", "/bin/db_ready.pl"]
+      interval: 1s
+      timeout: 30s
+      retries: 0
+
+  minion_worker: 
     image: minion_build
+    build: $PWD/minion
     command: /data/worker.pl
     volumes:
       - $PWD/minion/data:/data
     environment:
       CONNECTION_STRING: 'postgresql://mic:mic@kiels-laptop/mic'
       NUMBER_OF_JOBS: 12
+    env_file:
+      - db.env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     tty: true
+    healthcheck:
+      test: ["CMD-SHELL", "/bin/db_ready.pl"]
+      interval: 1s
+      timeout: 30s
+      retries: 0
+
+  acidworx:
+    image: kiels-laptop:5000/acidworx
+    build: $PWD/acidworx
+    volumes:
+        - $PWD/acidworx/AW1/dev/AcidWorx:/acidworx
+        #- nfs:/acidworx
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minion_worker:
+        condition: service_healthy
+#docker-compose rm -v postgres

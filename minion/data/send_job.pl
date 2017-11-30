@@ -6,7 +6,7 @@ use Data::Dumper 'Dumper';
 use feature 'say';
 
 # Connect to backend
-my $minion = Minion->new(Pg => 'postgresql://kiel:Tripper@kiels-laptop/test');
+my $minion = Minion->new(Pg => 'postgresql://mic:mic@kiels-laptop/mic');
 
 # Add tasks
 my $id = $minion->enqueue(build_img => [ 'svn', 'image_name', 'image_tag']);
