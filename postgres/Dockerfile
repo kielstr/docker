@@ -1,4 +1,4 @@
-FROM postgres:9.6.3
+FROM postgres:9.6.3 AS postgres
 
 RUN apt-get update && apt-get -y install \
 	apt-utils \

@@ -1,0 +1,16 @@
+version: "3.3"
+
+services:
+    mysql:
+        container_name: my_mysql
+        build: .
+        environment:
+            - MYSQL_DATABASES=testapp
+            - MYSQL_ROOT_PASSWORD=testing
+            - MYSQL_HOST=127.0.0.1
+            - MYSQL_PORT=33306
+            - MYSQL_USER=kiel
+            - MYSQL_PASSWORD=testing
+            - MYSQL_MY_DATABASE=testapp
+        ports:
+            - "3306:3306"

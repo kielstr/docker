@@ -1,4 +1,4 @@
-FROM namic:5000/debian_dancer2_starman_app
+FROM kiels-laptop:5000/debian_dancer2_starman_app AS acidworx
 
 RUN apt-get update -y && apt-get install -y perl-doc && apt-get install -y libdancer-perl
 
@@ -20,10 +20,8 @@ RUN apt-get -y install mysql-client
 
 RUN cpanm -i -n Plack::Middleware::ReverseProxy Plack::Middleware::ReverseProxyPath
 
-
-
 COPY ./Database.pm /usr/share/perl5/Dancer2/Plugin/Database.pm
 
 EXPOSE 8081
 
-CMD ["plackup", "-r", "-s", "Starman", "--workers=10", "-p", "8081", "-a", "/acidworx/bin/acidworx.psgi"]
+CMD ["plackup", "-R /acidworx/lib", "-s", "Starman", "--workers=10", "-p", "8081", "-a", "/acidworx/bin/acidworx.psgi"]

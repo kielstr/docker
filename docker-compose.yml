@@ -1,7 +1,9 @@
-version: '2.1'
+version: '3.3'
 
 services:
+
   postgres:
+    container_name: postgres
     ports:
       - "5432:5432"
     volumes:
@@ -10,16 +12,36 @@ services:
     build: $PWD/postgres
     env_file:
       - db.env
-
-    tty: true
+    networks:
+       - cluster-1
     healthcheck:
       test: ["CMD-SHELL", "/bin/db_ready.pl"]
       interval: 1s
       timeout: 30s
       retries: 0
 
+  mysql:
+    container_name: mysql
+    build: mysql
+    image: kiels-laptop:5000/mysql
+    environment:
+      - MYSQL_DATABASES=acidworx
+      - MYSQL_ROOT_PASSWORD=acidworx
+      - MYSQL_HOST=127.0.0.1
+      - MYSQL_PORT=3306
+      - MYSQL_USER=acidworx
+      - MYSQL_PASSWORD=TrippyMoon1234
+      - MYSQL_MY_DATABASE=acidworx
+    ports:
+      - "3306:3306"
+    volumes:
+      - "$PWD/mysql/data:/var/lib/mysql"
+    networks:
+      - cluster-1
+
   minion_worker: 
-    image: minion_build
+    container_name: minion_worker
+    image: kiels-laptop:5000/minion_build
     build: $PWD/minion
     command: /data/worker.pl
     volumes:
@@ -30,28 +52,37 @@ services:
     env_file:
       - db.env
     depends_on:
-      postgres:
-        condition: service_healthy
-    tty: true
+      #postgres:
+      #  condition: service_healthy
+      - postgres
+    #tty: true
     healthcheck:
       test: ["CMD-SHELL", "/bin/db_ready.pl"]
       interval: 1s
       timeout: 30s
       retries: 0
+    networks:
+      - cluster-1
 
   acidworx:
+    container_name: acidworx-webapp
     image: kiels-laptop:5000/acidworx
     build: $PWD/acidworx
     volumes:
-        - $PWD/acidworx/AW1/dev/AcidWorx:/acidworx
-        #- nfs:/acidworx
+      - $PWD/acidworx/AW1/dev/AcidWorx:/acidworx
     ports:
       - "8081:8081"
     depends_on:
-      postgres:
-        condition: service_healthy
-      minion_worker:
-        condition: service_healthy
+      - mysql
+    networks:
+      - cluster-1
+
+networks:
+  cluster-1:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.2.0/24
 
 
 #docker-compose rm -v postgres
