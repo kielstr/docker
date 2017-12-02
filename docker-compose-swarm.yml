@@ -20,7 +20,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.role == manager
+          - node.role == worker
     healthcheck:
       test: ["CMD-SHELL", "/bin/db_ready.pl"]
       interval: 1s
@@ -51,7 +51,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.role == manager
+          - node.role == worker
 
 #  minion_worker: 
 #    container_name: minion_worker
@@ -117,7 +117,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.role == manager
+          - node.role == worker
       labels:
         - "traefik.port=8081"
         - "traefik.backend=acidworx"
